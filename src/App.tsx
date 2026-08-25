@@ -69,7 +69,9 @@ export default function App() {
     setIsFlipped(false);
     setCurrentIndex(0);
     try {
-      const response = await fetch(`/${filename}`);
+      // Use import.meta.env.BASE_URL to support sub-path deployments like GitHub Pages
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const response = await fetch(`${baseUrl}${filename}`);
       const csvText = await response.text();
       
       Papa.parse(csvText, {
