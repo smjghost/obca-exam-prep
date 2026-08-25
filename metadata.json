@@ -1,0 +1,6 @@
+{
+  "name": "obca-备考刷题系统",
+  "description": "OceanBase OBCA 备考刷题系统",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
