@@ -1,515 +1,569 @@
-"front","back","type"
-"[单选题] 1、使用 Docker 部署的 OceanBase 集群可以作为MetaDB，OceanBase哪些产品线会把元数据库建在部署的这套产品需要MetaDB?
-A、OCP
-B、OBProxy
-C、OAT
-D、OMS","答案：A。
-解析：OCP 在部署时需要一个后台数据库（MetaDB）来存储集群管理、监控指标和告警等元数据信息。","单选题"
-"[单选题] 6、关于 OceanBase 的核心技术，下列说法错误的是：
-A. OceanBase 采用分布式架构实现了节点的高可用，数据在分布式的集群间会自动备份。
-B. OceanBase 具有极高压缩比...
-C. OceanBase 分布式能够提供机房级高可用...
-D. OceanBase 支持 HTAP 混合负载...","答案：B（或A）。
-解析：底层是基于 Paxos 的多副本强同步，而非传统意义的备份。此外单机分布式一体化使得成本更低。标准题库通常选A或指出压缩比相关描述错误。","单选题"
-"[单选题] 7、关于 OceanBase 的产品体系，下列说法错误的是：
-A. OMS 为 OceanBase 提供数据同步工具...
-B. OMA 为 OceanBase 数据库提供数据迁移评估工具，可以实现一站式数据库迁移。
-C. OCP 为 OceanBase 提供运维管理平台工具。
-D. OAS 为 OceanBase 提供自动调优服务工具。","答案：B。
-解析：OMA 主要是“迁移评估工具”；“一站式数据库迁移”功能是由 OMS 负责执行的。","单选题"
-"[单选题] 8、关于 OceanBase 的核心特点，下列说法错误的是：
-A. OceanBase 既然为大型核心业务系统设计，那么就不适合小微型企业使用。
-B. OceanBase 分布式数据库提供横向弹性扩展...
-C. OceanBase 分布式能够兼容 MySQL 和 Oracle...
-D. OceanBase 分布式数据库要做到数据多副本，所以对存储成本非常高。","答案：A 或 D（通常选D或多选）。
-解析：OceanBase 单机分布式一体化支持小微企业低成本起步。且基于 LSM-Tree，数据压缩比极高，多副本不仅没推高成本，反而降低了总存储成本。","单选题"
-"[单选题] 9、关系型数据库的发展经历了巨变，下列说法错误的是：
-A 从集中式走向分布式...
-B 与集中式数据库相比，分布式数据库主要关注的是更高的扩展性，而在高可用能力上没有特别的优势。
-C 使用分布式架构的分布式数据库系统能很好地处理复杂 SQL 查询和分析。
-D 原生分布式数据库不同于分布式中间件...","答案：B。
-解析：分布式数据库不仅关注高扩展性，其核心优势之一就是利用 Paxos 等协议提供了比集中式（主备复制）更强的高可用能力（RPO=0，秒级 RTO）。","单选题"
-"[单选题] 6、假设一个集群有3个 Zone，每个 Zone 有5台 OBServer，那么一个日志流在这个集群中全部的副本数是几个？
-A. 3 B. 5 C. 8 D. 15","答案：A。
-解析：OceanBase 的数据副本是跨 Zone 分布的，通常一个 Zone 包含一个副本，用于容灾。因此 3 个 Zone 就是 3 个副本。","单选题"
-"[单选题] 7、假设一个集群有3个 Zone，每个 Zone 有5台 OBServer，创建一个租户的资源池 Unit Num=3，该租户在集群中多少个节点上有该租户的资源单元？
-A. 3 B. 5 C. 9 D. 15","答案：C。
-解析：Unit Num=3 表示该租户在每个 Zone 内部分配 3 个资源单元（Unit）。集群共 3 个 Zone，总计在 3 * 3 = 9 个节点上分配了资源。","单选题"
-"[单选题] 8、OceanBase 没有实现以下哪种资源的租户隔离？
-A. CPU B. 内存 C. IOPS D. 网络带宽","答案：D。
-解析：OceanBase 实现了租户级的 CPU 和 内存严格物理隔离，并支持部分的 IOPS 隔离，但目前尚未实现严格的网络带宽隔离。","单选题"
-"[单选题] 9、RootService 是 OceanBase 的总控服务，以下哪个不是 RootService 的功能？
-A. 资源管理 B.路由管理 C. 负载均衡 D. Schema 管理","答案：B。
-解析：路由管理由 ODP (OBProxy) 负责，它负责解析 SQL 并将其路由到正确的 OBServer。RootService 负责集群全局资源、负载均衡和 Schema 等。","单选题"
-"[单选题] 10、关于总控服务，以下哪个说法是错误的？
-A. 总控服务在所有全能副本和日志副本中通过 Paxos 协议选举产生。
-B. 没有 MemTable 和 SSTable，资源占用很小。
-C. 如果总控服务发生宕机，集群会自动重新选举出 Leader 提供服务。
-D. 如果集群全部节点宕机，重启时总控服务需要人工介入才能恢复。","答案：D。
-解析：集群全部节点宕机后重启，只要有多数派节点存活并启动，Paxos 协议就会自动恢复 RootService Leader 选举，不需要人工干预。","单选题"
-"[单选题] 11、关于 OceanBase V4日志流的副本类型，下列说法正确的是。
-A. 副本类型目前分为全能副本和日志副本。
-B. 全能副本可读写，日志副本只读。
-C. Leader 副本可读写，全能副本的 Follower 只能读，日志副本不能读。
-D. 一个5副本集群，只要日志流3副本强同步，就可5副本强同步。","答案：A。
-解析：在 OceanBase V4 架构中，副本类型被精简为主流的全能副本（包含日志和数据，可选举可读写）和日志副本（仅日志，可选举，不提供数据读取）。","单选题"
-"[单选题] 12、关于 OceanBase V4 的负载均衡机制，下列说法正确的是。
-A. 用户指定其所在的 OBServer 节点位置。
-B. 用户可以通过表组（Tablegroup）来影响负载均衡...
-C. 自动负载均衡会将 Partition 均匀打散到 Zone 内所有 OBServer。
-D. 自动负载均衡会将 Leader 均匀打散到指定 Primary Zone。","答案：B。
-解析：表组 (Tablegroup) 允许用户将经常做 Join 操作的表分区绑定在一起，确保它们在系统自动负载均衡时被调度到同一个节点，以减少跨节点网络开销。","单选题"
-"[单选题] 6、OceanBase数据库通过什么机制来保证分布式事务在并发执行时不会读到不一致的数据？
-A. MVCC B. 两阶段提交 C. 锁机制 D. 全局时间戳","答案：A。
-解析：OceanBase 使用多版本并发控制 (MVCC) 机制来保证并发事务读取到一致的快照数据，实现读写互不阻塞。全局时间戳提供一致的版本号。","单选题"
-"[单选题] 7、以下哪项不是存储引擎需要完成的主要功能？
-A.数据存储 B. 数据读取 C. 数据分析 D. 数据合并","答案：C。
-解析：数据分析（SQL 的复杂计算等）属于执行引擎和 SQL 引擎的范畴。存储引擎主要负责落盘物理存储、读取、转储(Minor Freeze)与合并(Major Freeze)。","单选题"
-"[单选题] 8、OceanBase数据库中的多副本使用以下哪一种算法来确保分布式环境下的一致性？
-A. Raft B. Paxos C. Quorum D. Zab","答案：B。
-解析：OceanBase 的高可用架构和多副本之间的数据强一致性是基于 Multi-Paxos 协议实现的。","单选题"
-"[单选题] 9、在OceanBase数据库中，涉及多个分区的事务或者多个分区的写入，这种事务被称为什么类型的事务？
-A. 内部事务 B. 分布式事务 C. XA事务 D. 单元事务","答案：B。
-解析：跨越多个分区的读写操作（由于分区可能分布在不同节点上），被称为分布式事务，由 OceanBase 内置的两阶段提交（2PC）协议保证原子性。","单选题"
-"[单选题] 10.为了达到更好的压缩效果，OceanBase一般推荐进行几次压缩？
-A 1次 B 2次 C 3次 D 4次","答案：B。
-解析：OceanBase 的 SSTable 通常采用两级压缩（如先进行字典编码/前缀压缩，再使用通用块压缩算法如 LZ4/Zstd），以达到极高的数据压缩比。","单选题"
-"[单选题] 14、相比于集中式数据库，下列哪项是分布式数据库在事务处理上带来的挑战？
-A. 网络通信的不可靠 B. 节点故障的影响 C. 数据一致性的挑战 D. 性能下降","答案：C。
-解析：虽然分布式系统面临诸多挑战，但在事务处理（ACID）层面，“数据一致性的挑战”（如跨节点分布式事务的原子性和隔离性）是最核心的技术难题。","单选题"
-"[单选题] 5、使用 JDBC连接Oracle租户时，需要使用哪个JDBC驱动？
-A、 MySQL标准JDBC驱动
-B、Oracle标准JDBC驱动
-C、OceanBase自己开发的JDBC驱动","答案：C。
-解析：OceanBase 提供了针对其特性的 OceanBase JDBC 驱动（oceanbase-client），特别是连接 Oracle 模式租户时，必须使用该专用驱动。","单选题"
-"[单选题] 6、关于慢查询优化，以下说法不正确的是：
-A、通过 GV$OB_SQL_AUDIT 自动定位慢查询
-B、GV$OB_SQL_AUDIT 的 elapsed_time...代表总耗时...
-C、通过 explain 查看实际执行计划","答案：C。
-解析：EXPLAIN 命令生成的执行计划是优化器预估的逻辑执行计划（Estimated Plan），查看实际计划需依赖 trace 等诊断工具。","单选题"
-"[单选题] 1、以下哪项不属于OceanBase数据库DBA日常工作内容？
-A. 数据库安装 B. 应用SQL改写 C. 数据库性能优化 D. 数据备份","答案：B。
-解析：应用 SQL 的重构和改写主要是应用开发人员或业务架构师的职责；DBA 主要是进行安装部署、监控、性能调优和备份恢复。","单选题"
-"[单选题] 3、ASH报告主要用于排查系统资源是否瓶颈，它依赖于？
-A.日志 B. OCP Agent C. 存储 D.活动会话历史视图","答案：D。
-解析：ASH 即 Active Session History，它依赖于数据库内核提供的活动会话历史视图（如 GV$ACTIVE_SESSION_HISTORY）来生成报告。","单选题"
-"[单选题] 4、OBServer全链路追踪数据存储在哪个日志文件？
-A.observer.log B. election.log C. trace.log D.rootservice.log","答案：C (或 A)。
-解析：全链路追踪（Trace）的信息默认会输出打印到 trace.log 中。","单选题"
-"[单选题] 1、OceanBase 产品体系中,哪一款是数据迁移的工具?
-A OMS
-B OMA
-C OAS
-D OCP","答案：A。
-解析：OMS (OceanBase Migration Service) 是一站式数据迁移和同步平台，支持多种异构数据库向 OceanBase 迁移。","单选题"
-"[单选题] 2、OceanBase的总控服务提供很多功能，但不包括？
-A 管理Paxos选举
-B 同步数据日志
-C 集群自动容灾调度
-D 租户资源管理","答案：B。
-解析：RootService（总控服务）负责全局元数据管理、负载均衡等。数据日志的同步是由具体分区的 Paxos 组（全能副本）独立完成的。","单选题"
-"[单选题] 3、OceanBase的RootService服务不包含以下哪项?
-A 容灾管理
-B 负载均衡
-C 数据加密
-D schema管理","答案：C。
-解析：数据透明加密（TDE）是存储引擎层的机制，不属于 RootService 的管理职责。RootService 负责 schema管理、容灾和负载均衡。","单选题"
-"[单选题] 4、在衡量数据库的高可用能力时,RPO指标指代什么?
-A 业务恢复时间
-B 数据同步延迟
-C 故障数据恢复率
-D 丢失数据量","答案：D。
-解析：RPO 即恢复点目标，衡量灾难发生时允许丢失的最大数据量。OceanBase RPO=0。","单选题"
-"[单选题] 5、0ceanBase的哪个周边产品能够提供数据库监控指标，以及全链路诊断?
-A OMS
-B ODP
-C OCP
-D 总控服务","答案：C。
-解析：OCP 提供了全面的监控告警、性能诊断（如 SQL 审计、全链路追踪）以及自动化运维能力。","单选题"
-"[单选题] 6、为了达到更好的压缩效果,OceanBase一般推荐进行几次压缩?
-A 1次
-B 2次
-C 3次
-D 4次","答案：B。
-解析：通常采用两级压缩：第一级是底层的字典/差值编码等，第二级是针对数据块的通用压缩。","单选题"
-"[单选题] 7、在OceanBase数据库中,数据的编码压缩主要发生在哪个阶段?
-A 内存写入阶段
-B 数据读取阶段
-C 数据合并阶段
-D 数据转储阶段","答案：C。
-解析：在合并（Major Freeze）阶段，系统会将数据生成新的基线 SSTable，此时会进行最深度的编码和压缩以节省空间。","单选题"
-"[单选题] 8、OceanBase数据库通过哪种方式实现了高并发的分布式执行?
-A 单线程处理
-B 硬件加速
-C 分布式执行引擎
-D 硬件网卡优化","答案：C。
-解析：OceanBase 拥有强大的分布式 SQL 引擎和执行引擎，支持生成分布式执行计划（如并行查询 PQ）。","单选题"
-"[单选题] 9、在OceanBase数据库中,哪个组件负责接收SQL语句并为SQL执行选择合适的执行计划?
-A ODP(OBProxy)
-B SQL引擎
-C 存储引擎
-D 总控服务","答案：B。
-解析：SQL 引擎负责 SQL 的词法、语法解析、查询重写，并通过优化器生成执行计划。","单选题"
-"[单选题] 10、OceanBase数据库的底层存储引擎主要是针对读多写少的场景优化设计的什么架构?
-A B-Tree
-B LSM-Tree
-C Hash
-D 堆文件组织","答案：B。
-解析：OceanBase 的存储引擎基于 LSM-Tree 架构，将随机写转化为顺序写，提升写入性能并便于数据压缩。","单选题"
-"[单选题] 11、OceanBase数据库执行计划缓存(Plan Cache)的主要作用是什么?
-A 提高DML插入数据的效率
-B 提高SELECT读取数据的效率
-C 让SQL解析器自动优化
-D 避免SQL硬解析,提高SQL执行效率","答案：D。
-解析：Plan Cache 可以缓存 SQL 语句编译好的执行计划，下一次相同参数化 SQL 进来时（软解析），省去高昂的硬解析开销。","单选题"
-"[单选题] 12、为了能自动化安装部署OceanBase数据库时,我们需要将不同类型的数据分别放在不同目录,以下哪个目录可以不单独划分?
-A /home
-B /root
-C /data/log1
-D /data/1","答案：B。
-解析：/root 属于系统管理员目录，不需要也不建议单独划分为 OceanBase 的数据卷。","单选题"
-"[单选题] 13、以下哪个工具可以用来自动化安装部署OceanBase集群?
-A OBD
-B OCP
-C OAT
-D ODC","答案：A。
-解析：OBD (OceanBase Deployer) 是官方提供的用于自动化部署 OceanBase 集群的命令行工具。","单选题"
-"[单选题] 15、关于使用LOAD DATA命令，下列说法错误的是：
-A、客户端使用OBProxy连接数据库执行LOAD DATA命令,把OceanBase集群中一台OBServer节点上的csv文件导入到数据库中。
-B、使用LOAD DATA命令前,需要授予该文件给数据库的读取权限。
-C、LOAD DATA支持本地路径和远程路径两种方式。
-D、LOAD DATA使用本地路径时,需要指定direct 关键字的Hint","答案：A。
-解析：LOAD DATA 默认是从“客户端”所在机器或者连接的节点读取文件。如果是通过 OBProxy 连入，无法确定最终连接的是哪台 OBServer，因此本地文件导入通常需要客户端直连目标 OBServer，或使用网络存储/OSS。","单选题"
-"[单选题] 17、下列哪项日常运维操作不能通过OCP来执行?
-A、重启OBserver
-B、升级硬件
-C、替换OBserver
-D、升级集群","答案：B。
-解析：OCP 是软件层面的自动化运维平台，支持重启、替换、升级软件，但物理硬件的升级（如插拔内存、更换CPU）无法通过 OCP 执行。","单选题"
-"[单选题] 18、下列哪一项不属于OceanBase内核提供的监控诊断工具?
-A、OAS
-B、WR 和ASH
-C、SQL Trace
-D、系统内部视图","答案：A。
-解析：WR、ASH、SQL Trace 和内部视图都属于数据库内核自身提供的诊断能力；OAS（OceanBase 自动调优服务）等属于周边生态平台。","单选题"
-"[单选题] 22、假设一个5节点的OceanBase集群,最多允许几个节点故障而集群依然可用?
-A.1 B.2 C.3 D.4","答案：B。
-解析：根据 Paxos 多数派协议，5 副本集群的多数派是 3，因此最多允许 5-3 = 2 个节点故障。","单选题"
-"[单选题] 1、OceanBase 使用什么协议达成高可用和强一致性？
-A. 主从同步 + Paxos 协议
-B. 读写分离 + 高可用同步协议
-C. 日志同步 + 高可用同步协议
-D. 多副本 + Paxos 协议","答案：D。
-解析：OceanBase 使用无共享的多副本架构，各副本之间通过 Multi-Paxos 分布式一致性协议进行日志同步，实现 RPO=0。","单选题"
-"[单选题] 2、OceanBase 默认以什么为单位组建 Paxos 协议组？
-A. 租户
-B. 数据库
-C. 表
-D. 分区 (或日志流)","答案：D。
-解析：在早期的架构中，OceanBase 以分区（Partition）为单位组建 Paxos 组；在 V4.0 及以后，是以日志流（Log Stream）为单位。","单选题"
-"[单选题] 3、当应用向数据库写入事务时，默认会同步等待什么日志同步到多数派节点？
-A. Redo-Log 日志
-B. 系统日志
-C. Undo-log 日志
-D. 审计信息","答案：A。
-解析：事务提交时，必须等待 Redo-Log （重做日志）通过 Paxos 协议同步到多数派节点并落盘后，才返回给应用提交成功。","单选题"
-"[单选题] 4、OceanBase 内核采用的选举协议是？
-A. Paxos
-B. Raft
-C. Zookeeper
-D. ZAB","答案：A。
-解析：OceanBase 实现了自主研发的基于 Multi-Paxos 算法的分布式强一致性协议。","单选题"
-"[单选题] 5、管理员可以通过哪个命令创建资源池？
-A. create resource unit
-B. create resource pool
-C. create tenant
-D. create database","答案：B。
-解析：创建资源池的 DDL 语句是 CREATE RESOURCE POOL。","单选题"
-"[单选题] 6、OceanBase 不支持什么操作系统？
-A. CentOS
-B. Windows
-C. 统信操作
-D. 麒麟操作","答案：B。
-解析：OceanBase 目前只能部署在 Linux 操作系统上，不支持 Windows。","单选题"
-"[单选题] 7、OceanBase 一般用户的登录格式？
-A. 用户名@租户名，例如 root@sys
-B. 租户名@用户名，例如 sys@root
-C. 用户名@数据库名，例如 root@oceanbase
-D. 数据库名@用户名，例如 oceanbase@root","答案：A。
-解析：OceanBase 为了区分不同租户的用户，直连（或通过直连端口）登录格式为 `用户名@租户名`。如果通过 OBProxy，通常是 `用户名@租户名#集群名`。","单选题"
-"[单选题] 8、Linux 操作系统一般创建什么用户安装 OceanBase？
-A. root
-B. obuser
-C. observer
-D. admin","答案：D。
-解析：在部署规范中，OceanBase 通常推荐使用 admin 用户进行安装部署，而非直接使用 root 用户。","单选题"
-"[单选题] 9、ConfigServer(config url)主要是给以下哪个组件提供的？
-A. ODC
-B. OCP
-C. OMS
-D. OBProxy","答案：D。
-解析：OBProxy 作为代理路由，需要知道集群的节点列表和状态。它可以通过访问 ConfigServer 动态获取集群的位置信息。","单选题"
-"[单选题] 10、部署 OceanBase 集群时，各 OBServer 间 RPC 时钟同步时间偏移最多？
-A. 1 毫秒
-B. 10 毫秒
-C. 100 毫秒
-D. 200 毫秒","答案：C。
-解析：OceanBase 强依赖时钟同步（NTP/Chrony）以生成全局时间戳。节点间时钟偏差过大（通常超过 100ms）会导致事务不可用或集群异常。","单选题"
-"[单选题] 11、""major_freeze_duty_time"" 设置为 ""02:00"" 意味着什么？
-A. 每天凌晨2点，自动触发一次转储操作
-B. 每天凌晨2点，自动触发一次合并操作
-C. 每天凌晨2点，自动触发一次内存清理操作
-D. 每天凌晨2点，自动触发一次数据恢复操作","答案：B。
-解析：`major_freeze_duty_time` 参数用于设置系统每天自动触发全局大合并（Major Freeze）的时间。","单选题"
-"[单选题] 12、通过哪个命令可以查询系统参数？
-A. show parameters like '%<pattern>%';
-B. alter system set <name>=<value>;
-C. show variables like '%<pattern>%';
-D. set @@global.<name>=<value>;","答案：A。
-解析：在 OceanBase 中，`show parameters` 用于查看集群/租户级别的系统配置项（Parameters）；而 `show variables` 用于查看兼容 MySQL 模式的系统变量（Variables）。","单选题"
-"[单选题] 13、OceanBase 是一个什么类型的数据库？
-A. 内存式数据库
-B. NoSQL 数据库
-C. 分布式关系型数据库
-D. 图数据库","答案：C。
-解析：OceanBase 是一款原生的企业级分布式关系型数据库（RDBMS），兼具 NoSQL 的高扩展性和关系型数据库的强一致性。","单选题"
-"[单选题] 16、关于OceanBase的架构特点，以下哪个是错误的？
-A.无共享
-B.全局等价节点
-C.准内存数据库
-D.集中式管控","答案：D。
-解析：OceanBase 是对等节点无共享（Shared-Nothing）分布式架构，没有传统的集中式存储或管控单点瓶颈。RootService 只是逻辑总控。","单选题"
-"[单选题] 17、OceanBase的产品体系中，数据库内核的兼容性基于什么？
-A.MySQL
-B.PostgreSQL
-C.完全自主研发，同时兼容MySQL和Oracle
-D.基于开源分支","答案：C。
-解析：OceanBase 是蚂蚁集团完全自主研发的原生分布式数据库，不基于任何开源产品分支，并在内核层面实现了对 MySQL 和 Oracle 的高度兼容。","单选题"
-"[单选题] 18、OceanBase的存储结构被称为？
-A.准内存数据库
-B.纯硬盘数据库
-C.纯内存数据库
-D.内存数据库","答案：A。
-解析：OceanBase 被称为“准内存数据库”，因为它的增量修改（DML）都在内存中完成（MemTable），而基线数据存储在磁盘中（SSTable）。","单选题"
-"[单选题] 19、OceanBase 可以支持极高写性能的核心存储引擎架构是？
-A. COLA
-B. LSM-TREE
-C. Key-Value
-D. BTREE","答案：B。
-解析：基于 LSM-Tree（日志结构合并树）架构，OceanBase 将随机写转化为内存中的顺序写，极大地提升了写入性能。","单选题"
-"[单选题] 20、OceanBase 数据库推荐使用的磁盘介质是什么？
-A. SAS 机械盘
-B. SSD 固态盘
-C. SAS 机械盘 + SSD 固态盘
-D. 磁带","答案：B。
-解析：为了保证生产环境的读写性能，OceanBase 强力推荐且主要依赖 SSD 固态盘作为存储介质。","单选题"
-"[单选题] 21、OceanBase 把内存中增量数据，合并到磁盘基线数据的过程称为什么？
-A. 转储
-B. 合并
-C. 刷新
-D. 压缩","答案：B。
-解析：合并（Major Freeze）是指将内存中的 MemTable 增量数据与磁盘中的 SSTable 基线数据进行合并，生成新的基线 SSTable 的过程。","单选题"
-"[单选题] 22、为了达到更好的压缩效果，OceanBase 一般推荐进行几次压缩？
-A. 1 次
-B. 2 次
-C. 3 次
-D. 4 次","答案：B。
-解析：OceanBase 通常在合并时采用两级压缩技术（底层编码压缩 + 通用块压缩），以达到极高的数据压缩比。","单选题"
-"[单选题] 23、关于 OceanBase 数据库主键特点，说法错误的是：
-A. 保证数据唯一
-B. 不能为空
-C. 强制要求用户必须建立主键
-D. 业务上可以不显式定义主键","答案：C。
-解析：虽然推荐用户建立主键，但并非强制。如果用户不显式定义主键，OceanBase 会在底层隐式创建一个隐藏的主键（类似 rowid）来保证数据组织的正确性。","单选题"
-"[单选题] 24、OceanBase 使用哪种机制解决读写并发冲突？
-A. MVCC
-B. Paxos 协议
-C. 全局锁
-D. 读写锁","答案：A。
-解析：多版本并发控制（MVCC）机制使得读操作可以读取数据的历史版本，从而实现了读写互不阻塞，解决了读写并发冲突。","单选题"
-"[单选题] 25、OceanBase 使用哪种机制保证跨节点分布式事务的原子性？
-A. 一阶段提交
-B. 两阶段提交
-C. 三阶段提交
-D. MVCC","答案：B。
-解析：对于涉及多个节点的分布式事务，OceanBase 内置了优化的两阶段提交（2PC）协议来保证事务的原子性（要么全成功，要么全失败）。","单选题"
-"[单选题] 26、两阶段提交协议中，谁是协调者？
-A. OB Proxy
-B. 接收请求的任意 OB Server
-C. RootService 总控服务
-D. 发起该事务的日志流 Leader 所在的 OB Server","答案：D。
-解析：在 OceanBase 中，分布式事务的协调者（Coordinator）通常是该事务第一条语句所访问的数据所在的日志流 Leader，即发起该事务参与的 OBServer。","单选题"
-"[单选题] 27、对于 Primary Zone 配置副本，OceanBase 支持哪种级别的容灾调度？
-A. 租户级别
-B. 数据库级别
-C. 表级别
-D. 表组级别","答案：A。
-解析：Primary Zone 决定了 Leader 副本的分布偏好。在 OceanBase 中，Primary Zone 是在“租户”级别进行配置和调度的。","单选题"
-"[单选题] 28、建立 table group 的主要目的是？
-A. 方便业务表按照业务功能分类
-B. 减少跨节点分布式事务
-C. SQL 优化器能够识别
-D. 更好的实现负载均衡","答案：B。
-解析：Tablegroup 将经常进行 Join 的关联表绑定在一起，使得它们的对应分区调度到同一台节点上，将跨机分布式事务转化为单机事务，提升性能。","单选题"
-"[单选题] 29、当集群中某节点宕机时，OceanBase 首先切换的服务级别是什么？
-A. 整个集群
-B. 租户级别
-C. 数据库级别
-D. 领导者副本的日志流 (Partition/LogStream Leader)","答案：D。
-解析：节点宕机后，Paxos 协议会在秒级内自动为该节点上的所有 Leader 副本（日志流）在其他存活节点上重新选举出新的 Leader，恢复服务。","单选题"
-"[单选题] 30、3个Zone，2个同城，1个异地，同城一个机房宕机，下列说法正确的是：
-A. 强一致同步延迟变大
-B. 会丢失秒级数据
-C. 集群不可用
-D. 合并业务基本不受影响","答案：A。
-解析：同城机房宕机后，原本的同城多数派被打破，剩下的节点（1个同城+1个异地）仍能构成多数派继续服务。但因为同步需要跨城，强一致同步网络延迟会变大。数据不会丢失(RPO=0)。","单选题"
-"[单选题] 31、如果从传统 Oracle 业务迁移到 OceanBase，需要进行实时同步，推荐使用哪个工具？
-A. OCP
-B. DataX
-C. OMS
-D. ODC","答案：C。
-解析：OMS (OceanBase Migration Service) 提供了从 Oracle、MySQL 等异构数据库到 OceanBase 的全量迁移和增量实时同步功能。","单选题"
-"[单选题] 32、关于 OceanBase 资源隔离，以下哪一项是正确的？
-A. 集群资源隔离
-B. 数据库级隔离
-C. schema 隔离
-D. 租户级物理隔离","答案：D。
-解析：OceanBase 的多租户架构实现了租户级别的物理资源（CPU、内存）严格隔离。","单选题"
-"[单选题] 33、哪个组件负责全集群资源分配、全局 DDL、集群数据合并调度等功能？
-A. OB Proxy
-B. RootService 总控服务
-C. OCP 运维平台
-D. ODC 开发者工具","答案：B。
-解析：RootService（简称 RS）是 OceanBase 集群的内置总控服务，负责全局元数据管理、DDL、资源调度和合并控制。","单选题"
-"[单选题] 34、哪个客户端工具可以直接连接 Oracle 租户进行业务开发？
-A. OBClient (OceanBase 客户端) / ODC
-B. 标准 MySQL 客户端
-C. OCP 运维平台
-D. Navicat","答案：A。
-解析：Oracle 模式租户必须使用 OceanBase 定制的客户端（OBClient）或开发者工具（ODC）、驱动进行连接。标准 MySQL 客户端无法连接 Oracle 租户。","单选题"
-"[单选题] 35、5个Zone，每个Zone有10台OB Server，一个分区日志流在集群中全部的副本数是？
-A. 10
-B. 3
-C. 6
-D. 5","答案：D。
-解析：通常情况下，副本是跨 Zone 分布的，一个 Zone 内只保留该日志流的一个副本。5个 Zone 则共有 5 个副本。","单选题"
-"[单选题] 36、关于 RootService 总控服务，说法正确的是：
-A. 每个Zone会有一个主控OB Server节点
-B. 每个Zone有一个主控分区日志流
-C. 整个集群只有一个主控Leader提供服务
-D. 每台OB Server都会有一个","答案：C。
-解析：RootService 本质上也是一个特殊的系统内部表（__all_core 等）的 Leader 副本，整个集群只有一个 RootService Leader 提供总控服务。","单选题"
-"[单选题] 37、3机房3Zone部署，关于 Root Service 说法正确的是：
-A. 整个集群只有一个主控Leader
-B. 每个机房一个主控
-C. 每个 observer 上都有 RootService提供服务
-D. Root Service 不是必须的","答案：A。
-解析：无论多少个机房或 Zone，RootService 始终是由 Paxos 选举产生的一个唯一 Leader 节点来提供全局服务。","单选题"
-"[单选题] 38、3个Zone，每Zone 5台OB Server，租户资源 Unit Num=4，请问有多少个节点上有该租户资源单元？
-A. 3
-B. 5
-C. 12
-D. 15","答案：C。
-解析：Unit Num=4 表示该租户在每个 Zone 内部被分配了 4 个资源单元（Unit）。共有 3 个 Zone，所以总计在 4 * 3 = 12 个节点上分配了资源。","单选题"
-"[单选题] 39、OceanBase 租户资源的分配方式是：内存是 ___，CPU 是 ___？
-A. 共享分配，独占分配
-B. 独占分配，共享分配
-C. 独占分配，独占分配
-D. 共享分配，共享分配","答案：B。
-解析：在租户资源隔离中，内存是严格的独占分配（物理预留），不可超卖；而 CPU 是通过 cgroup 进行共享分配控制，支持超卖。","单选题"
-"[单选题] 40、关于 OceanBase 集群升级，说法正确的是：
-A. 需要维护人员停业务停机
-B. 需要业务应用修改代码
-C. 支持动态轮转升级，对业务透明
-D. 必须使用高性能物理机替换","答案：C。
-解析：得益于多副本和高可用架构，OceanBase 支持逐个节点的动态轮转升级（Rolling Upgrade），升级过程中业务不受影响（零停机）。","单选题"
-"[单选题] 41、哪个平台提供图形化界面，支持集群管理、租户管理、性能监控和告警？
-A. ODC
-B. OCP
-C. OB Proxy
-D. OB Server","答案：B。
-解析：OCP (OceanBase Control Platform) 是官方的白屏化全生命周期运维管理平台。","单选题"
-"[单选题] 42、关于全能副本，说法正确的是：
-A. 有 MemTable 和 SSTable，参与投票，可快速恢复为 leader
-B. 没有日志
-C. 不参与投票
-D. 没有数据只有日志","答案：A。
-解析：全能副本（Full Replica）包含完整的日志和数据（MemTable + SSTable），参与 Paxos 投票选举，并且可以被选举为 Leader 提供读写服务。","单选题"
-"[单选题] 43、OceanBase 支持哪些分区类型？
-A. Hash、List、Range
-B. Hash、List
-C. 只有 Range
-D. 只有 Hash","答案：A。
-解析：OceanBase 支持主流的关系型数据库分区策略，包括 Range（范围）、List（列表）和 Hash（哈希）等一级和二级分区。","单选题"
-"[单选题] 44、OceanBase 有哪些主要的副本类型？
-A. 全能副本、日志副本、只读副本
-B. 全能副本、数据副本
-C. 读写副本、只读副本
-D. 主副本、备副本","答案：A。
-解析：在 V4.0 及之前的版本中，常见的副本类型包括全能副本、仅同步日志不存数据的日志副本，以及不参与投票的只读副本（Readonly Replica）。","单选题"
-"[单选题] 45、OceanBase 商业版支持哪种数据库 SQL 语法兼容？
-A. MySQL
-B. 仅 Oracle
-C. 仅 DB2
-D. 同时兼容 MySQL 和 Oracle","答案：D。
-解析：OceanBase 的多租户架构允许在同一个集群内创建 MySQL 兼容模式租户和 Oracle 兼容模式租户。","单选题"
-"[单选题] 46、OBProxy（OceanBase 代理服务器）默认监听客户端连接的端口是？
-A. 2881
-B. 2882
-C. 2883
-D. 2884","答案：C。
-解析：OBProxy 默认监听 2883 端口处理客户端的 SQL 请求；而 OBServer 的 SQL 监听端口默认是 2881，RPC 端口是 2882。","单选题"
-"[单选题] 47、在 OceanBase 数据库中，用于内部节点间通信的 RPC 端口默认是？
-A. 2881
-B. 2882
-C. 2883
-D. 2884","答案：B。
-解析：OBServer 节点之间通过 RPC 协议进行内部通信（如 Paxos 日志同步、分布式执行调度等），默认端口为 2882。","单选题"
-"[单选题] 48、关于 OceanBase 的备份恢复机制，物理备份主要备份的是什么？
-A. 仅有数据文件 (SSTable)
-B. 仅有日志文件 (Clog)
-C. 数据文件 (SSTable) + 增量事务日志 (Clog)
-D. 逻辑 SQL 脚本","答案：C。
-解析：物理备份包括基线数据（Data Backup，即 SSTable）和日志归档（Log Archive，即 Clog 日志）。结合这两者可以实现任意时间点恢复 (PITR)。","单选题"
-"[单选题] 49、当执行一条全表扫描的 SQL 时，OceanBase 的 SQL 引擎如何处理？
-A. 只能在单个节点串行执行
-B. 会把所有数据拉取到 OBProxy 执行
-C. 可以生成分布式并行执行计划 (PX)，利用多节点并行扫描计算
-D. 会被系统拒绝执行","答案：C。
-解析：OceanBase 拥有强大的分布式执行引擎（Parallel Execution, PX），可以将全表扫描任务划分为多个 Task，分发到各个数据所在节点并行执行，最后聚合结果。","单选题"
-"[单选题] 50、ODC（OceanBase 开发者中心）主要用于什么场景？
-A. 集群的全生命周期管理与安装部署
-B. 数据库对象的开发、SQL 编辑执行、PL/SQL 调试与数据导入导出
-C. 异构数据库的数据迁移与实时同步
-D. 物理服务器资源的监控","答案：B。
-解析：ODC 是开发者工具，主要面向开发人员和 DBA 进行日常的 SQL 编写、调试和数据对象管理。集群管理是 OCP 的功能，迁移同步是 OMS 的功能。","单选题"
-"[单选题] 51、OceanBase 的 BlockCache（数据块缓存）主要用来缓存什么？
-A. 经常访问的 SQL 执行计划
-B. 数据表中的微块 (Micro Block) 数据，加速读操作
-C. 分布式事务的状态信息
-D. Paxos 的选举信息","答案：B。
-解析：KVCache 中的 BlockCache 用于缓存在磁盘 SSTable 中被频繁读取的数据块，减少物理 I/O，极大提高点查和范围查询的性能。","单选题"
-"[单选题] 52、关于 OceanBase 中 Zone 的描述，错误的是：
-A. Zone 是一个逻辑概念，通常映射为一个物理机房
-B. 同一个 Zone 内可以包含多台 OBServer
-C. 租户的数据副本通常会在不同的 Zone 之间分布以实现容灾
-D. 一个 Zone 宕机，整个集群的数据就会彻底丢失不可恢复","答案：D。
-解析：只要剩余的 Zone 能够构成 Paxos 的多数派（例如 3 个 Zone 宕了 1 个，还剩 2 个），集群依然可用且数据不会丢失 (RPO=0)。","单选题"
-"[单选题] 53、在 OceanBase 的 Oracle 模式下，哪种对象可以封装和组织多个相关的存储过程和函数？
-A. Package (包)
-B. Trigger (触发器)
-C. Sequence (序列)
-D. Synonym (同义词)","答案：A。
-解析：OceanBase 的 Oracle 兼容模式支持 Package（包），可以将逻辑相关的存储过程、函数、变量等进行封装和集中管理，高度兼容 Oracle 语法。","单选题"
-"[单选题] 54、关于 OceanBase 中租户的内存隔离，说法错误的是？
-A. 租户内存是物理独占的，互不干扰
-B. 当某个租户内存不足时，可以借用其他空闲租户的内存
-C. 租户的内存上限由 Unit 的配置决定
-D. 租户内存不足会导致该租户内的事务因内存溢出报错","答案：B。
-解析：OceanBase 租户的内存分配是严格的物理预留和隔离的，不可超卖，也不支持在运行时动态去“借用”其他租户的内存，这样保证了极高的稳定性和隔离性。","单选题"
-"[单选题] 55、如果要在 OceanBase 集群中新建一个业务，第一步通常是做什么？
-A. 创建表组 (Tablegroup)
-B. 创建资源单元模板 (Resource Unit)
-C. 直接执行 Create Database
-D. 直接执行 Create User","答案：B。
-解析：在 OceanBase 的多租户架构下，新建业务的流程通常是：创建 Unit 模板 -> 创建 Resource Pool (资源池) -> 创建 Tenant (租户) -> 在租户内创建 Database/Schema。","单选题"
+﻿题号,题目(正面),答案(背面),题型
+1,以下哪项不属于OceanBase数据库内核暴露的管理接口？ A. OCP 管理控制台 B. 内部系统表（如 __all_xxx） C. 内部系统视图（如 GV$xxx） D. 各种 DDL 管理命令,"正确答案：A
+
+官方解析
+选项 A：OCP 管理控制台 —— 不属于（应选）
+产品定位：OCP（OceanBase Cloud Platform）是 OceanBase 的外部企业级运维管控平台，属于生态工具层，是独立于数据库内核运行的 Web 应用系统。
+
+调用关系：OCP 本身是管理接口的使用方，它正是通过底层的 SQL 命令、系统视图、系统表等内核接口来采集数据和下发管理指令的，因此 OCP 本身不属于内核暴露的管理接口。
+
+选项 B：内部系统表（如 __all_xxx）—— 属于（不选）
+内核接口定义：__all_xxx 系列表是 OceanBase 内核自带的底层元数据表（如 __all_tenant、__all_server、__all_zone 等），由集群内核的 RootServer/Sys 租户维护，直接暴露给管理员用于查看和排查最底层的元数据状态。
+
+选项 C：内部系统视图（如 GV$xxx / V$xxx）—— 属于（不选）
+内核接口定义：GV$xxx（全局动态性能视图）和 V$xxx（节点级动态性能视图）是 OceanBase 内核通过虚拟表机制对外暴露的标准监控与诊断接口（如 GV$OB_SERVERS、GV$OB_PARAMETERS 等），用户可通过标准 SQL 实时查询集群的运行指标和内部状态。
+
+选项 D：各种 DDL 管理命令 —— 属于（不选）
+内核接口定义：OceanBase 内核通过 SQL 引擎原生支持大量的管控类 DDL/管理语句（例如 ALTER SYSTEM BOOTSTRAP、ALTER SYSTEM ADD SERVER ...、ALTER SYSTEM MINOR FREEZE、CREATE TENANT ... 等），这是内核最标准、最核心的管理指令接口。
+
+考点总结
+OceanBase 内核暴露的管理接口（SQL 级）：
+管理/运维类 SQL 命令（如 ALTER SYSTEM ... 等集群管理 DDL）。
+系统表与内部表（如 __all_server、__all_tenant 等）。
+动态性能视图（如 GV$xxx、V$xxx、DBA_xxx 等）。
+外部运维与生态组件（非内核暴露接口）：
+OCP（云平台管理管控平台）
+OAT（自动化部署工具）
+OBD（开源安装部署工具）",单选题
+2,关于 OceanBase 的核心技术，以下说法错误的是（ ）  A. OceanBase 依赖分布式中间件实现了在单机数据库上的分布式访问和事务处理。  B. OceanBase 自研的高压缩技术平衡了“性能”和“压缩”的瓶颈，既能大幅压缩数据，减少磁盘空间占用，又不会造成较大的性能负担。  C. OceanBase 分布式架构提供了极致高可用能力，在少数节点故障时可以保证数据领丢失（RPO=0），对业务的影响时间极短（RTO<8s）。  D. OceanBase 支持 HTAP 混合负载，通过多租户的资源隔离来保证不同类型的租户间互不干扰，同时通过多副本技术让一份数据既能做事务处理又能实时分析。,"正确答案：A
+详细解析
+ A 项说法错误（符合题意）：
+OceanBase 是一款原生分布式数据库（Native Distributed Database），底层采用 Shared-Nothing（无共享）架构完全自主研发，其分布式路由、分布式事务、数据分片及 Paxos 一致性共识协议均在内核引擎层原生实现，并不依赖任何分库分表的分布式中间件在单机数据库上做拼装。
+ B 项说法正确：
+OceanBase 基于准内存（LSM-tree）架构设计了独有的分层存储与行列混存压缩技术，在基线数据持久化时结合了高压缩率的字典、前缀等编码及通用压缩算法，既大幅降低了存储成本，又通过内存解压优化保障了读取性能。
+ C 项说法正确：
+OceanBase 采用基于 Paxos 协议的多副本多数派机制，当集群中少数派节点发生物理故障时，多数派副本能自动选主接管业务，保证数据零丢失（RPO = 0），故障切换时间极短（RTO < 8s）。
+ D 项说法正确：
+OceanBase 原生具备 HTAP（混合事务/分析处理）能力，基于原生多租户架构在 CPU、内存、I/O 等维度进行物理级资源隔离，结合多副本强一致特性，可在保证 OLTP 业务高性能低时延的同时，支持只读副本或分析型引擎进行高并发实时 OLAP 分析。",单选题
+3,关于 OceanBase 的产品体系，以下说法错误的是（ ）  A. OMS 是 OceanBase 提供的数据同步工具，可以把其他数据库的数据同步到OceanBase 数据库中，比如将 Oracle 数据库的数据同步到 OceanBase 的 Oracle 租户。  B. OMA 是 OceanBase 数据库提供的数据迁移与评估工具，可以实现一键式的数据库迁移。  C. OCP 是 OceanBase 提供的云平台管理工具，可以将多个 OceanBase 集群统一纳管到一个 OCP 中进行管理、监控。  D. OAS 是 OceanBase 提供的自治服务工具，可以提供自动化的优化建议和智能化的故障诊断能力。,"正确答案：B
+
+详细解析
+B 项说法错误（符合题意）：
+OMA（OceanBase Migration Assessment） 是 OceanBase 的迁移评估工具，主要用于迁移前对源端数据库进行对象兼容性评估、SQL 语法改写建议、应用负载回放及性能评估等，它本身并不负责执行具体的数据迁移。负责实现一站式、全生命周期数据迁移与同步的工具是 OMS（OceanBase Migration Service）。
+A 项说法正确：
+OMS（OceanBase Migration Service） 是 OceanBase 提供的数据传输/迁移与同步服务，支持异构数据库（如 Oracle、MySQL、PostgreSQL 等）向 OceanBase 数据库的数据迁移与实时同步。
+C 项说法正确：
+OCP（OceanBase Cloud Platform） 是企业级云平台运维管控工具，支持对多个 OceanBase 集群进行全生命周期的集中纳管、监控告警、性能诊断与自动化运维。
+D 项说法正确：
+OAS（OceanBase Autonomous Service） 是 OceanBase 提供的数据库自治服务工具，依托机器学习与专家经验，提供智能故障根因分析、容量预测、慢 SQL 诊断及自动化调优建议等自治能力。",单选题
+4,假设一个集群有3个 Zone，每个 Zone 有5台 OBServer，那么一个日志流在这个集群中全部的副本数是几个？ A. 3 B. 5 C. 8 D. 15,"正确答案：A
+
+详细解析
+在 OceanBase 数据库的架构设计中，日志流（Log Stream）与副本（Replica）、Zone 之间的分布规则如下：
+Paxos 副本的 Zone 分布原则：
+为了实现跨机房/跨可用区的容灾高可用能力，对于同一个日志流而言，在一个 Zone 内最多只能存在 1 个 Paxos 副本（全功能副本 F / 日志型副本 L）。
+本题分析：
+虽然每个 Zone 拥有 5 台 OBServer，但同一个 Zone 内同一日志流不会放置多个 Paxos 成员副本（全功能副本），以避免单 Zone 故障导致多个多数派选票丢失。
+因此，该集群一共有 3 个 Zone，该日志流在每个 Zone 最多放置 1 份全功能副本，总共最多拥有 3 份全功能副本（即常见的 3 副本分布：F@zone1, F@zone2, F@zone3）。",单选题
+5,假设一个集群有3个 Zone，每个 Zone 有5台 OBServer，创建一个租户的资源池 Unit Num=3，该租户在集群中多少个节点上有该租户的资源单元？ A. 3 B. 5 C. 9 D. 15,"正确答案：C
+
+详细解析
+在 OceanBase 的多租户资源分配模型中：
+UNIT_NUM 的定义：
+资源池中的 UNIT_NUM 参数表示在每个 Zone 内所分配的资源单元（Resource Unit）的数量。
+服务器与 Unit 的约束规则：
+同一租户在同一台 OBServer 节点上最多只能容纳 1 个资源单元（Unit）。当 UNIT_NUM = 3 时，意味着该租户在对应的每个 Zone 内都会占用 3 台独立的 OBServer 服务器。
+总量计算：
+集群包含的 Zone 数：3 个
+每个 Zone 内占用的 OBServer 数量：3 台
+该集群中分配有该租户资源单元的服务器总数：
+Zone 数量 × UNIT_NUM = 3 × 3 = 9 台",单选题
+6,OceanBase 没有实现以下哪种资源的租户隔离？ A. CPU B. 内存 C. IOPS D. 数据磁盘,"正确答案：D
+
+详细解析
+OceanBase 的多租户架构实现了计算与内存等多维度的资源隔离，但不能实现物理数据磁盘层面的租户间隔离：
+A 项（CPU 资源）：可以实现隔离。通过配置 Resource Unit 的 MIN_CPU 和 MAX_CPU，结合内部独立的租户工作线程池以及 Linux 系统的 cgroup 机制精确控制。
+B 项（内存资源）：可以实现严格隔离。通过 Resource Unit 中的 MEMORY_SIZE 为每个租户划分独立的内存空间，严格隔离、互不借用与争抢。
+C 项（IOPS / 磁盘 I/O）：可以实现隔离。支持通过配置 MIN_IOPS、MAX_IOPS、IOPS_WEIGHT 进行限速与优先级隔离。
+D 项（数据磁盘）：不能实现隔离（符合题意）。在单台 OBServer 节点上，所有驻留在该节点的租户共享同一块物理数据磁盘及同一个底层数据存储文件（block_file），无法做到租户间的物理磁盘隔离。",单选题
+7,RootService 是 OceanBase 的总控服务，以下哪个不是 RootService 的功能？ A. 资源管理 B.路由管理 C. 负载均衡 D. Schema 管理,"正确答案：B
+
+详细解析
+RootService（简称 RS） 是 OceanBase 集群的总控服务，主要负责全局维度的集群管理、元数据管理与分布式协同调度：
+B 项（路由管理）：不是 RootService 的功能（符合题意）
+数据库访问的路由管理是由 OBProxy（以及 OBServer 内部的 SQL 路由转发层 Location Cache）负责的。客户端发送 SQL 时，OBProxy 会解析 SQL 并根据本地缓存的位置信息直接将请求精准路由到目标 Leader 节点所在的 OBServer 上，并不由 RootService 实时提供路由服务。
+A 项（资源管理）：是 RootService 的核心功能，负责管理资源单元规格、分配 Unit、调度资源池等。
+C 项（负载均衡）：是 RootService 的核心功能，通过自动触发 Unit 迁移、副本搬迁以及切主实现动态负载均衡。
+D 项（Schema 管理）：是 RootService 的核心功能，负责处理全局 DDL 变更的多版本发布与广播。",单选题
+8,关于总控服务，以下哪个说法是错误的？ A. 总控服务在所有全能副本和日志副本中通过 Paxos 协议选举产生。 B. 没有 MemTable 和 SSTable，资源占用很小。 C. 如果总控服务发生宕机，集群会自动重新选举出 Leader 提供服务。 D. 如果集群全部节点宕机，重启时总控服务需要人工介入才能恢复。,"正确答案：D
+
+详细解析
+D 项说法错误（符合题意）：
+OceanBase 具备高可用与全自动自愈能力。当集群所有节点宕机后重新启动时，各 OBServer 会自动拉起底层进程，系统租户（sys 租户）的日志流副本通过 Paxos 协议自动重新组网、达成多数派共识并选出新的 Leader，随后新的 Leader 会自动拉起总控服务（RootService），整个恢复过程完全自动化，无需人工介入。
+A 项说法正确：总控服务运行在系统租户的 Leader 节点上，依托 Paxos 协议在各可用副本中自动选举产生。
+B 项说法正确：总控服务主要在内存中维护元数据及状态机，自身不读写业务数据的 MemTable/SSTable，资源占用极小。
+C 项说法正确：若运行 RS 的节点故障，sys 租户多副本迅速触发 Paxos 重新选主并自动接管服务。",单选题
+9,关于 OceanBase V4日志流的副本类型，下列说法正确的是。 A. 副本类型目前分为全能副本和日志副本。 B. 全能副本可读写，日志副本只读。 C. Leader 副本可读写，全能副本的 Follower 只能读，日志副本不能读。 D. 一个5副本集群，只要日志流3副本强同步，就可5副本强同步。,"正确答案：C
+
+详细解析
+在 OceanBase 4.x（V4）架构中，日志流（Log Stream）的副本属性与读写能力说明如下：
+C 项说法正确（符合题意）：
+Leader 副本（主副本）：作为 Paxos 组的领导者，拥有完整的数据（MemTable + SSTable）和事务日志，对外提供强一致性的读与写服务。
+全能/全功能副本的 Follower（从副本）：包含完整的数据和日志，但不能直接处理事务写入，仅能对外提供弱一致性读（只读）。
+日志型副本（Log Replica / L 副本）：仅同步并持久化 Paxos 日志（Clog）并参与多数派投票，不包含 MemTable 和 SSTable 业务数据，因此完全不能提供读服务。
+A 项错误：副本体系还支持只读型副本（R 副本）等。
+B 项错误：日志副本无物理数据，完全不能承载读请求。
+D 项错误：5 副本集群达成多数派（3 副本同步）事务即可提交，其余 2 副本在后台异步推进同步。",单选题
+10,OceanBase数据库通过什么机制来保证分布式事务在并发执行时不会读到不一致的数据？ A. MVCC B. 两阶段提交 C. 锁机制 D. 全局时间戳,"正确答案：A
+
+详细解析
+A 项（MVCC - 多版本并发控制）：核心机制
+在并发读写场景下，为了防止事务读到中间态或脏数据（保证读一致性），OceanBase 采用 MVCC（Multi-Version Concurrency Control）。每个写操作都会生成带有版本号的新数据行，读操作则基于事务的快照版本号读取对应可见的历史版本，从而实现读写互不阻塞且保证读取到的始终是一致性快照视图。
+D 项（全局时间戳 / GTS）：为分布式 MVCC 提供统一的时序基准。
+B 项（两阶段提交 / 2PC）：主要用于保证分布式事务跨节点执行时的原子性（Atomicity）。
+C 项（锁机制）：主要用于解决写-写并发冲突。",单选题
+11,以下哪项不是存储引擎需要完成的主要功能？ A.数据存储 B. 数据读取 C. 数据分析 D. 数据合并,"正确答案：C
+
+详细解析
+数据库系统通常分为 SQL 引擎（计算引擎）与存储引擎两大核心子系统：
+C 项（数据分析）：不是存储引擎的主要功能（符合题意）
+复杂的数据分析（如大规模聚合运算、多表关联 JOIN、窗口函数计算、优化器执行计划生成等）属于 SQL 计算引擎 / 执行引擎 的核心职责。
+A 项（数据存储）：是存储引擎的核心功能，负责将写入/更新的数据持久化到内存和底层磁盘中。
+B 项（数据读取）：是存储引擎的核心功能，根据上层请求检索底层数据块并管理缓存。
+D 项（数据合并 / Compaction）：是存储引擎的核心功能，负责内存增量（MemTable）与磁盘基线（SSTable）的冻结、转储与大合并。",单选题
+12,OceanBase数据库中的多副本使用以下哪一种算法来确保分布式环境下的一致性？ A. Raft B. Paxos C. Quorum D. Zab,"正确答案：B
+
+详细解析
+B 项正确（Paxos）：
+OceanBase 数据库内核采用自研的 Multi-Paxos 分布式共识算法来管理多副本之间的日志同步与选主，确保在分布式网络通信环境下达成多数派强一致性与金融级高可用（RPO=0，RTO<8s）。
+A 项（Raft）、C 项（Quorum 机制模型）、D 项（ZAB 协议）均非 OceanBase 底层的核心共识算法。",单选题
+13,在OceanBase数据库中，涉及多个分区的事务或者多个分区的写入，这种事务被称为什么类型的事务？ A. 内部事务 B. 分布式事务 C. XA事务 D. 单元事务,"正确答案：B
+
+详细解析
+B 项正确（分布式事务）：
+在 OceanBase 数据库中，事务根据涉及的数据分区（Partition）或日志流（Log Stream）范围进行分类：
+本地事务（Local Transaction）：事务操作的所有数据仅位于单个分区（或同一个日志流节点）上，无需跨节点协同。
+分布式事务（Distributed Transaction）：事务的操作跨越了多个不同分区（或跨多个日志流/多个服务器节点）。此时需要通过两阶段提交协议（2PC）配合全局时间戳（GTS）来协调所有参与者，保证事务的 ACID 特性。
+A 项错误（内部事务）：指数据库系统自身后台运行的元数据维护、转储合并触发等内部管理逻辑产生的事务。
+C 项错误（XA 事务）：指遵循 X/Open XA 规范、由外部应用或外部事务管理器协调的分布式事务。",单选题
+14,为了达到更好的压缩效果，OceanBase一般推荐进行几次压缩？ A 1次 B 2次 C 3次 D 4次,"正确答案：B
+
+详细解析
+OceanBase 独创了两级压缩（即 2 次压缩）技术，在大合并（Major Compaction）写入基线数据 SSTable 时按顺序执行两层压缩处理，以平衡性能与存储成本：
+第一次：基于数据特征的高级编码（Encoding）
+在微块（Micro Block）内部，针对不同数据类型的特征自适应选择模式转换、字典编码（Dictionary）、游程编码（RLE）、前缀编码（Prefix）、差分编码等轻量级编码算法。
+第二次：通用压缩算法（General Compression）
+经过第一层编码后的数据块，会再送入通用的无损数据压缩算法（如 LZ4、zstd、Snappy 等）进行二次物理压缩。
+通过 2 次压缩机制，OceanBase 通常可以实现高达 70%~90% 的综合压缩率。",单选题
+15,相比于集中式数据库，下列哪项是分布式数据库在事务处理上带来的挑战？ A. 网络通信的不可靠 B. 节点故障的影响 C. 数据一致性的挑战 D. 性能下降,"正确答案：C
+
+详细解析
+相比于集中式数据库，分布式数据库将数据切片存放在多个网络节点上，面临的主要挑战包括网络不可靠、部分节点故障以及数据一致性保证。
+其中：
+C 项（数据一致性的挑战）：是分布式事务处理中最核心、最本质的挑战。要实现全局一致的隔离性与原子性，必须引入复杂的共识算法（Paxos）与全局时序服务（GTS）。
+在单选题标准答案中通常对应 C 项。",单选题
+16,使用 JDBC连接Oracle租户时，需要使用哪个JDBC驱动？ A、 MySQL标准JDBC驱动 B、Oracle标准JDBC驱动 C、OceanBase自己开发的JDBC驱动,"正确答案：C
+
+详细解析
+C 项正确（OceanBase 自己开发的 JDBC 驱动）：
+连接 OceanBase 的 Oracle 模式租户时，必须使用 OceanBase 官方自研的 JDBC 驱动（OceanBase Connector/J）。该驱动兼容了 Oracle 的语法特性、数据类型与交互协议，驱动类名通常为 com.oceanbase.jdbc.Driver，URL 格式为 jdbc:oceanbase://...。
+B 项错误（Oracle 标准 JDBC 驱动）：标准 Oracle JDBC 驱动（如 ojdbc）基于 Oracle 专有的底层通信协议（TNS / Net8），无法直接连接 OceanBase。
+A 项错误（MySQL 标准 JDBC 驱动）：仅适用于连接 OceanBase 的 MySQL 租户。",单选题
+17,"针对慢查询的优化，以下描述不正确的是________？  A、通过 GV$OB_SQL_AUDIT 可以定位慢查询  B、GV$OB_SQL_AUDIT 中 elapsed_time，execute_time 以及 queue_time 分别代表总耗时,执行时间以及排队时间  C、通过 explain 查看的是真实的执行计划","正确答案：C
+
+详细解析
+C 项描述不正确（符合题意）：
+通过 EXPLAIN 命令查看的是优化器在编译期生成的逻辑/物理执行计划（即预估执行计划），其中显示的行数、代价等都是基于统计信息预估的。真实的物理执行路径与实际耗时分布，需要通过 SQL Plan Monitor（GV$SQL_PLAN_MONITOR）或 Plan Cache 视图来查看。
+A 项描述正确：GV$OB_SQL_AUDIT 视图记录了集群各节点执行的每一条 SQL 请求的元数据及耗时信息，可快速定位慢 SQL。
+B 项描述正确：elapsed_time 代表总耗时，execute_time 代表实际执行时间，queue_time 代表排队时间。",单选题
+18,以下哪项不属于OceanBase数据库DBA日常工作内容？ A. 数据库安装 B. 应用SQL改写 C. 数据库性能优化 D. 数据备份,"正确答案：B
+
+详细解析
+B 项（应用 SQL 改写）：不属于 DBA 日常工作核心范畴（符合题意）
+业务层面的 SQL 逻辑编写与改写（如业务逻辑调整、代码层面的 SQL 重构）主要是应用开发人员（Application Developer）的职责。DBA 会提供性能调优建议，但直接改写业务应用程序中的 SQL 属于研发范畴。
+A 项（数据库安装）、C 项（数据库性能优化）、D 项（数据备份）均属于 DBA 的日常核心工作。",单选题
+19,ASH报告主要用于排查系统资源是否瓶颈，它依赖于？ A.日志 B. OCP Agent C. 存储 D.活动会话历史视图,"正确答案：D
+
+详细解析
+D 项正确（活动会话历史视图）：
+ASH（Active Session History，活动会话历史）报告是性能诊断的核心工具之一。系统以固定频率（通常每秒 1 次）对所有处于活跃状态的会话进行快照采样并记录在活动会话历史视图（如 GV$ACTIVE_SESSION_HISTORY / V$ACTIVE_SESSION_HISTORY）中。生成 ASH 报告时直接依托这些视图中记录的会话状态、等待事件、SQL ID 及资源消耗进行聚合分析。",单选题
+20,OBServer全链路追踪数据存储在哪个日志文件？ A.observer.log B. election.log C. trace.log D.rootservice.log,"正确答案：C
+
+详细解析
+OceanBase 数据库各类运行与诊断日志分工如下：
+C 项正确（trace.log）：专门记录全链路追踪（Trace / Full Link Trace）相关的 span、tag 以及 SQL 在各个组件间流转的调用链路耗时信息。
+A 项（observer.log）：OBServer 主系统运行日志。
+B 项（election.log）：Paxos 多副本分布式选举相关日志。
+D 项（rootservice.log）：总控服务（RootService）集群管控日志。",单选题
+21,"OceanBase 产品体系中,哪一款是数据迁移的工具? A OMS B OMA C OAS D OCP","正确答案：A
+
+详细解析
+A 项正确（OMS - OceanBase Migration Service）：
+OMS 是官方提供的数据传输与迁移服务，支持异构数据库与 OceanBase 之间的一站式数据迁移与实时增量同步。
+B 项（OMA）：数据迁移评估工具，用于迁移前的兼容性评估与改写建议。
+C 项（OAS）：数据库自治服务，提供智能诊断与优化。
+D 项（OCP）：云平台运维管控工具，用于集群管理与监控。",单选题
+22,OceanBase的总控服务提供很多功能，但不包括？ A 管理Paxos选举 B 同步数据日志 C 集群自动容灾调度 D 租户资源管理,"正确答案：B
+
+详细解析
+B 项（同步数据日志）：不属于总控服务的功能（符合题意）
+数据事务日志（Clog / PALF 日志）的持久化与网络同步是由各个日志流（Log Stream）底层的分布式共识与日志复制引擎（Paxos/PALF 模块）在副本节点之间以点对点（P2P）RPC 方式直接完成的，完全不经过总控服务（RootService）。
+A 项（管理 Paxos 选举）、C 项（集群自动容灾调度）、D 项（租户资源管理）均属于总控服务的核心功能范畴。",单选题
+23,OceanBase的RootService服务不包含以下哪项? A 容灾管理 B 负载均衡 C 数据加密 D schema管理,"正确答案：C
+
+详细解析
+C 项（数据加密）：不属于 RootService 的功能（符合题意）
+透明数据加密（TDE）等数据加解密功能属于存储引擎层的职责，在数据落盘时由本地存储层调用加密算法执行加解密计算。
+A 项（容灾管理）、B 项（负载均衡）、D 项（Schema 管理）均为 RootService 的核心功能。",单选题
+24,"在衡量数据库的高可用能力时,RPO指标指代什么? A 业务恢复时间 B 数据同步延迟 C 故障数据恢复率 D 丢失数据量","正确答案：D
+
+详细解析
+在衡量数据库及容灾系统的高可用与容灾能力时：
+RPO（Recovery Point Objective，恢复点目标 / 丢失数据量，D 项）：指系统发生故障后允许丢失的最大数据量。RPO=0 表示零数据丢失。
+RTO（Recovery Time Objective，恢复时间目标 / 业务恢复时间，A 项）：指系统发生故障到业务恢复正常对外服务所需的时间。",单选题
+25,OceanBase的哪个周边产品能够提供数据库监控指标，以及全链路诊断? A OMS B ODP C OCP D 总控服务,"正确答案：C
+
+详细解析
+C 项正确（OCP - OceanBase Cloud Platform）：
+OCP 是企业级云平台管理与运维管控中心。它提供集群/主机/租户维度的丰富性能与资源监控指标，并深度集成了全链路追踪与诊断（Full Link Trace）功能，能够白屏化直观展示完整调用链路耗时与性能瓶颈。
+A 项（OMS）：数据迁移与同步服务。
+B 项（ODP / OBProxy）：数据库访问代理/路由组件。
+D 项（RootService）：内核运行的总控管理模块。",单选题
+26,"为了达到更好的压缩效果,OceanBase一般推荐进行几次压缩? A 1次 B 2次 C 3次 D 4次","正确答案：B
+
+详细解析
+OceanBase 数据库独创了两级压缩机制（即 2 次压缩）。在基线数据进行大合并（Major Compaction）持久化落盘时，微块会依次经过：
+第一次压缩：基于数据特征的高级编码（Encoding，如字典、前缀、游程编码等，支持不解压直接过滤计算）。
+第二次压缩：通用物理压缩（General Compression，如 LZ4、zstd 等无损压缩）。
+综合实现 70%~90% 的数据压缩率并保障极高读取性能。",单选题
+27,"在OceanBase数据库中,数据的编码压缩主要发生在哪个阶段? A 内存写入阶段 B 数据读取阶段 C 数据合并阶段 D 数据转储阶段","正确答案：C
+
+详细解析
+C 项正确（数据合并阶段 / Major Compaction）：
+OceanBase 的两级压缩机制（高级特征编码 + 通用压缩算法）主要且最彻底地发生在大合并（Major Compaction）阶段。此时系统掌握该分区的全局完整数据，进行全局模式分析并对微块执行深度编码与二次压缩。
+A 项（内存写入阶段）：写入 MemTable，保持未压缩以保障极速写入。
+B 项（数据读取阶段）：执行解压与解码。
+D 项（数据转储阶段）：快速刷盘以释放内存，通常只进行轻量级压缩。",单选题
+28,OceanBase数据库通过哪种方式实现了高并发的分布式执行? A 单线程处理 B 硬件加速 C 分布式执行引擎 D 硬件网卡优化,"正确答案：C
+
+详细解析
+C 项正确（分布式执行引擎）：
+OceanBase 自研了强大的分布式执行引擎与并行执行框架（Parallel Execution / PX）。面对复杂 SQL 与多分区查询时，优化器生成分布式执行计划，分布式执行引擎将任务切分为子任务并行调度到各节点的工作线程协同计算，实现高并发、高吞吐的分布式计算能力。",单选题
+29,"在OceanBase数据库中,哪个组件负责接收SQL语句并为SQL执行选择合适的执行计划? A ODP(OBProxy) B SQL引擎 C 存储引擎 D 总控服务","正确答案：B
+
+详细解析
+B 项正确（SQL 引擎 / SQL Engine）：
+SQL 引擎是 OBServer 内核中负责 SQL 处理的核心计算组件。依次进行词法/语法解析、语义分析与查询改写、基于代价的优化器（CBO）生成最优执行计划以及执行器调度执行。
+A 项（ODP / OBProxy）：负责路由转发。
+C 项（存储引擎）：负责底层数据读写与存储。
+D 项（总控服务）：负责集群管控调度。",单选题
+30,OceanBase数据库的底层存储引擎主要是针对读多写少的场景优化设计的什么架构? A B-Tree B LSM-Tree C Hash D 堆文件组织,"正确答案：B
+
+详细解析
+B 项正确（LSM-Tree 架构）：
+OceanBase 采用了基于 LSM-Tree 改进的存储引擎架构。写操作在内存 MemTable 完成并记录 Clog；读操作结合多级缓存（Row Cache、Block Cache、Bloom Filter Cache 等）、微块索引与只读 SSTable 进行多版本归并，既拥有极高的写入吞吐，又针对读多写少的 OLTP/OLAP 业务提供了极致的查询性能。",单选题
+31,"OceanBase数据库执行计划缓存(Plan Cache)的主要作用是什么? A 提高DML插入数据的效率 B 提高SELECT读取数据的效率 C 让SQL解析器自动优化 D 避免SQL硬解析,提高SQL执行效率","正确答案：D
+
+详细解析
+D 项正确（避免 SQL 硬解析，提高 SQL 执行效率）：
+Plan Cache（执行计划缓存）用于避免相同或参数化同构 SQL 重复进行繁重的语法解析、语义分析与优化器寻优计算（即由硬解析转为软解析），从而显著降低 CPU 消耗、减少响应延迟并大幅提升系统吞吐量。",单选题
+32,"为了能自动化安装部署OceanBase数据库时,我们需要将不同类型的数据分别放在不同目录,以下哪个目录可以不单独划分? A /home B /root C /data/log1 D /data/1","正确答案：B
+
+详细解析
+B 项（/root 目录）：可以不单独划分（符合题意）
+/root 是 Linux 系统的超级用户主目录。OceanBase 官方要求数据库以普通用户（admin 用户）运行，不依赖 /root 目录。
+A 项（/home）：存放软件安装包与运行日志，建议独立划分以防打满根分区。
+C 项（/data/log1）：事务日志（Clog）目录，必须独立挂载在高性能磁盘上。
+D 项（/data/1）：基线数据（SSTable）目录，必须独立划分大容量存储。",单选题
+33,以下哪个工具可以用来自动化安装部署OceanBase集群? A OBD B OCP C OAT D ODC,"正确答案：A
+
+详细解析
+A 项正确（OBD - OceanBase Deployer）：
+OBD 是官方专门提供的轻量级自动化安装与部署运维 CLI 工具，通过 YAML 配置文件或命令行一键完成环境预检、安装分发、初始化与集群启动。
+B 项（OCP）亦具备白屏化部署集群能力，在官方标准单选题中部署工具通常首选 A. OBD。",单选题
+34,下列哪项日常运维操作不能通过OCP来执行? A、重启OBserver B、升级硬件 C、替换OBserver D、升级集群,"正确答案：B
+
+详细解析
+B 项（升级硬件）：不能通过 OCP 来执行（符合题意）
+升级硬件属于底层物理服务器或虚拟机的物理硬件变更（如更换 CPU、内存条、磁盘），OCP 作为软件层运维管理平台无法替代物理基础设施操作。
+A 项（重启 OBServer）、C 项（替换故障 OBServer 节点）、D 项（滚动升级集群版本）均支持在 OCP 控制台中直接操作。",单选题
+35,下列哪一项不属于OceanBase内核提供的监控诊断工具? A、OAS B、WR 和ASH C、SQL Trace D、系统内部视图,"正确答案：A
+
+详细解析
+A 项（OAS - OceanBase Analytics Suite / 自治服务套件）：不属于内核原生组件（符合题意）
+OAS 属于外部智能自治与分析工具套件。
+B 项（WR 和 ASH 报告）、C 项（SQL Trace 全链路追踪）、D 项（系统内部动态性能视图如 GV$OB_SQL_AUDIT）均属于 OceanBase 内核自带原生提供的监控与诊断能力。",单选题
+36,"假设一个5节点的OceanBase集群,最多允许几个节点故障而集群依然可用? A.1 B.2 C.3 D.4","正确答案：B
+
+详细解析
+B 项正确（2 个节点）：
+在典型的 5 副本（5 节点）Paxos 部署架构中，达成共识所需的多数派为：⌊5/2⌋ + 1 = 3 个节点。
+因此最大可容忍的故障节点数为：5 - 3 = 2 个节点。只要存活节点数 ≥ 3，集群即可正常进行 Paxos 投票与选主，保证数据一致性与服务可用性。",单选题
+37,OceanBase 使用什么协议达成高可用和强一致性？ A. 主从同步 + Paxos 协议 B. 读写分离 + 高可用同步协议 C. 日志同步 + 高可用同步协议 D. 多副本 + Paxos 协议,"正确答案：D
+
+详细解析
+D 项正确（多副本 + Paxos 协议）：
+OceanBase 的高可用与强一致性核心基石是基于多副本（Multi-Replica）的分布式 Paxos 共识协议（Multi-Paxos）。事务日志必须同步到多数派副本落盘确认后才提交，少数派故障时秒级自动选主恢复，实现 RPO=0 和 RTO<8s。",单选题
+38,OceanBase 默认以什么为单位组建 Paxos 协议组？ A. 租户 B. 数据库 C. 表 D. 分区 (或日志流),"正确答案：D
+
+详细解析
+D 项正确（分区 / 日志流）：
+在 OceanBase 1.x~3.x 中，以分区（Partition）为单位组建 Paxos 复制组；在 OceanBase 4.x 中，以日志流（Log Stream）为基本单位组建 Paxos 协议组。在认证考试体系中，分区/日志流始终是组建 Paxos 复制组的基本单元。",单选题
+39,当应用向数据库写入事务时，默认会同步等待什么日志同步到多数派节点？ A. Redo-Log 日志 B. 系统日志 C. Undo-log 日志 D. 审计信息,"正确答案：A
+
+详细解析
+A 项正确（Redo-Log 日志 / Clog）：
+在事务提交流程中，事务修改产生的重做日志（Redo-Log / Clog）必须通过 Paxos 协议向多副本节点广播，并在多数派副本完成持久化落盘确认后，事务才算正式提交成功并返回客户端，从而保证已提交事务零丢失。",单选题
+40,OceanBase 内核采用的选举协议是？ A. Paxos B. Raft C. Zookeeper D. ZAB,"正确答案：A
+
+详细解析
+A 项正确（Paxos）：
+OceanBase 内核深度自研并采用了 Multi-Paxos 分布式共识协议作为其底层选举与日志复制的核心协议。各日志流副本组通过基于 Paxos 的无共享去中心化选举算法配合 Lease（租约）机制自主推选 Leader，无需依赖外部协调组件。",单选题
+41,管理员可以通过哪个命令创建资源池？ A. create resource unit B. create resource pool C. create tenant D. create database,"正确答案：B
+
+详细解析
+B 项正确（CREATE RESOURCE POOL）：
+用于创建资源池（Resource Pool），将资源单元规格（Unit）绑定到具体的 Zone 列表和副本数量上。
+A 项（CREATE RESOURCE UNIT）：创建资源单元规格。
+C 项（CREATE TENANT）：创建租户。
+D 项（CREATE DATABASE）：在租户内创建数据库。",单选题
+42,OceanBase 不支持什么操作系统？ A. CentOS B. Windows C. 统信操作 D. 麒麟操作,"正确答案：B
+
+详细解析
+B 项（Windows）：不支持（符合题意）
+OceanBase 数据库服务端（OBServer）是纯 Linux 架构设计的企业级分布式数据库，依赖 Linux 内核诸多底层特性（如异步 I/O libaio、cgroups 隔离等），不支持在 Windows 操作系统上作为服务端部署运行。
+A、C、D 项（CentOS、统信 UOS、银河麒麟）均得到官方深度适配与认证支持。",单选题
+43,OceanBase 一般用户的登录格式？ A. 用户名@租户名，例如 root@sys B. 租户名@用户名，例如 sys@root C. 用户名@数据库名，例如 root@oceanbase D. 数据库名@用户名，例如 oceanbase@root,"正确答案：A
+
+详细解析
+A 项正确（用户名@租户名，例如 root@sys）：
+直连 OBServer 时登录格式为 用户名@租户名（如 root@sys 或 user1@tenant_app）；
+通过 OBProxy 连接时格式为 用户名@租户名#集群名（如 root@sys#obcluster）。",单选题
+44,Linux 操作系统一般创建什么用户安装 OceanBase？ A. root B. obuser C. observer D. admin,"正确答案：D
+
+详细解析
+D 项正确（admin）：
+根据 OceanBase 官方安装部署规范与最佳实践，统一创建并使用 admin 用户（属于 admin 用户组）来运行和管理 OBServer 进程及周边工具，默认安装与日志目录通常配置在 /home/admin 下。",单选题
+45,ConfigServer(config url)主要是给以下哪个组件提供的？ A. ODC B. OCP C. OMS D. OBProxy,"正确答案：D
+
+详细解析
+D 项正确（OBProxy / ODP）：
+ConfigServer（及 config_url）主要为 OBProxy（数据库代理）提供服务。OBProxy 启动和运行时定期向 ConfigServer 发起 HTTP 请求动态获取集群中各 OBServer / RootService 的最新状态与 IP 列表以维护路由。",单选题
+46,部署 OceanBase 集群时，各 OBServer 间 RPC 时钟同步时间偏移最多？ A. 1 毫秒 B. 10 毫秒 C. 100 毫秒 D. 200 毫秒,"正确答案：C
+
+详细解析
+C 项正确（100 毫秒）：
+OceanBase 官方明确要求所有 OBServer 节点必须配置 NTP / Chrony 时钟同步服务，且各节点之间的时钟偏差（Clock Skew）最大不能超过 100 毫秒（100 ms），以保证 Paxos 租约与分布式事务因果时序正常。",单选题
+47,"""major_freeze_duty_time"" 设置为 ""02:00"" 意味着什么？ A. 每天凌晨2点，自动触发一次转储操作 B. 每天凌晨2点，自动触发一次合并操作 C. 每天凌晨2点，自动触发一次内存清理操作 D. 每天凌晨2点，自动触发一次数据恢复操作","正确答案：B
+
+详细解析
+B 项正确（每天凌晨2点，自动触发一次合并操作）：
+major_freeze_duty_time 是用于控制每日大合并（Major Compaction / Major Freeze）触发时间的系统参数，设置为 ""02:00"" 意味着系统会在每天凌晨 2:00 自动发起每日例行的全局大合并。",单选题
+48,通过哪个命令可以查询系统参数？ A. show parameters like '%<pattern>%'; B. alter system set <name>=<value>; C. show variables like '%<pattern>%'; D. set @@global.<name>=<value>;,"正确答案：A
+
+详细解析
+A 项正确（SHOW PARAMETERS LIKE '%<pattern>%';）：
+用于查看 OceanBase 集群/租户级的系统参数（Parameters）。
+B 项：修改系统参数。
+C 项：查询系统变量（Variables）。
+D 项：修改全局系统变量。",单选题
+49,OceanBase 是一个什么类型的数据库？ A. 内存式数据库 B. NoSQL 数据库 C. 分布式关系型数据库 D. 图数据库,"正确答案：C
+
+详细解析
+C 项正确（分布式关系型数据库）：
+OceanBase 是完全自主研发的原生分布式关系型数据库（Distributed Relational Database），支持标准 SQL 与 ACID 事务，具备高可用、水平扩展、强一致性及 HTAP 能力。",单选题
+50,关于OceanBase的架构特点，以下哪个是错误的？ A.无共享 B.全局等价节点 C.准内存数据库 D.集中式管控,"正确答案：D
+
+详细解析
+D 项错误（符合题意）：
+OceanBase 采用去中心化、分布式管控架构，不存在集中式单点控制节点。RootService 作为轻量服务嵌入在 OBServer 中由 Paxos 选举产生，节点宕机自动接管。
+A 项（无共享 / Shared-Nothing）、B 项（全局等价节点）、C 项（准内存数据库设计）均为其真实架构特点。",单选题
+51,OceanBase的产品体系中，数据库内核的兼容性基于什么？ A.MySQL B.PostgreSQL C.完全自主研发，同时兼容MySQL和Oracle D.基于开源分支,"正确答案：C
+
+详细解析
+C 项正确（完全自主研发，同时兼容 MySQL 和 Oracle）：
+OceanBase 从第一行代码自研，采用双模式兼容设计，在租户级别原生兼容 MySQL 模式与 Oracle 模式。",单选题
+52,OceanBase的存储结构被称为？ A.准内存数据库 B.纯硬盘数据库 C.纯内存数据库 D.内存数据库,"正确答案：A
+
+详细解析
+A 项正确（准内存数据库 / Quasi-in-Memory Database）：
+写操作全在内存 MemTable 完成并记录日志，读操作通过多级缓存高效命中，定期通过转储与合并下沉至磁盘 SSTable 编码压缩存储，兼具内存级性能与磁盘级持久化成本优势。",单选题
+53,OceanBase 可以支持极高写性能的核心存储引擎架构是？ A. COLA B. LSM-TREE C. Key-Value D. BTREE,"正确答案：B
+
+详细解析
+B 项正确（LSM-TREE）：
+所有增删改操作全在内存 MemTable 中完成，磁盘仅需顺序追加写入事务日志（Clog），将随机写转化为纯内存写与磁盘顺序写，带来极致的写入吞吐与写性能。",单选题
+54,OceanBase 数据库推荐使用的磁盘介质是什么？ A. SAS 机械盘 B. SSD 固态盘 C. SAS 机械盘 + SSD 固态盘 D. 磁带,"正确答案：B
+
+详细解析
+B 项正确（SSD 固态盘 / NVMe SSD）：
+事务日志盘（Clog）与基线数据盘（Data）均强烈推荐使用 SSD 固态硬盘，以提供极低的写 I/O 延迟与高并发吞吐能力，满足 Paxos 毫秒级落盘与大合并扫描需求。",单选题
+55,OceanBase 把内存中增量数据，合并到磁盘基线数据的过程称为什么？ A. 转储 B. 合并 C. 刷新 D. 压缩,"正确答案：B
+
+详细解析
+B 项正确（合并 / Major Compaction / 大合并）：
+将内存增量数据（MemTable）及转储数据（Minor SSTable）与磁盘静态基线数据（Baseline SSTable）完全融合并生成全新基线数据的过程称为合并（Major Compaction）。
+A 项（转储）：将 MemTable 快速刷写到磁盘生成转储 SSTable 以释放内存。",单选题
+56,为了达到更好的压缩效果，OceanBase 一般推荐进行几次压缩？ A. 1 次 B. 2 次 C. 3 次 D. 4 次,"正确答案：B
+
+详细解析
+B 项正确（2 次）：
+OceanBase 在大合并时采用独创的两级压缩技术（底层高级编码压缩 + 通用块压缩），以达到极高的数据压缩比与优异的查询性能。",单选题
+57,关于 OceanBase 数据库主键特点，说法错误的是： A. 保证数据唯一 B. 不能为空 C. 强制要求用户必须建立主键 D. 业务上可以不显式定义主键,"正确答案：C
+
+详细解析
+C 项说法错误（符合题意）：
+OceanBase 并不强制要求建表时显式指定主键。如果未定义主键，系统会在后台自动生成隐藏自增主键（__pk_increment）来维护底层有序索引结构。
+A 项（保证唯一）、B 项（不能为空）、D 项（业务上可不显式定义）均正确。",单选题
+58,OceanBase 使用哪种机制解决读写并发冲突？ A. MVCC B. Paxos 协议 C. 全局锁 D. 读写锁,"正确答案：A
+
+详细解析
+A 项正确（MVCC - 多版本并发控制）：
+写操作生成带版本号的新数据行，读操作根据快照版本号读取对应历史版本，实现读不阻塞写、写不阻塞读，彻底解决读写并发冲突。写写并发冲突通过行锁保护。",单选题
+59,OceanBase 使用哪种机制保证跨节点分布式事务的原子性？ A. 一阶段提交 B. 两阶段提交 C. 三阶段提交 D. MVCC,"正确答案：B
+
+详细解析
+B 项正确（两阶段提交 / 2PC）：
+跨节点分布式事务通过两阶段提交协议（Prepare 阶段 + Commit 阶段）结合底层 Paxos 多数派日志复制，保证分布式事务跨节点的原子性（要么全部提交，要么全部回滚）。",单选题
+60,两阶段提交协议中，谁是协调者？ A. OB Proxy B. 接收请求的任意 OB Server C. RootService 总控服务 D. 发起该事务的日志流 Leader 所在的 OB Server,"正确答案：D
+
+详细解析
+D 项正确（发起该事务的日志流 Leader 所在的 OBServer）：
+分布式两阶段提交采用去中心化设计，由事务涉及的日志流中发起该事务的日志流 Leader 所在的 OBServer 驱动协调者状态机，避免中心化瓶颈并减少网络跳数。",单选题
+61,对于 Primary Zone 配置副本，OceanBase 支持哪种级别的容灾调度？ A. 租户级别 B. 数据库级别 C. 表级别 D. 表组级别,"正确答案：A
+
+详细解析
+A 项正确（租户级别）：
+Primary Zone 最核心且最基础的配置维度是租户级别（Tenant Level），控制该租户内所有日志流/分区 Leader 副本优先驻留的物理 Zone，实现租户级一键容灾调度与流量切流。",单选题
+62,建立 table group 的主要目的是？ A. 方便业务表按照业务功能分类 B. 减少跨节点分布式事务 C. SQL 优化器能够识别 D. 更好的实现负载均衡,"正确答案：B
+
+详细解析
+B 项正确（减少跨节点分布式事务）：
+表组（Tablegroup）将强业务关联的多张表/分区在物理上聚集调度在同一个 OBServer 节点上，将跨机分布式事务转化为单机本地事务，并支持高效的本地关联（Partition-wise Join）。",单选题
+63,当集群中某节点宕机时，OceanBase 首先切换的服务级别是什么？ A. 整个集群 B. 租户级别 C. 数据库级别 D. 领导者副本的日志流 (Partition/LogStream Leader),"正确答案：D
+
+详细解析
+D 项正确（领导者副本的日志流 Partition / LogStream Leader）：
+OceanBase 故障恢复的基本单位是日志流（Log Stream）的副本组。当节点宕机时，仅针对该节点上受影响的 Leader 副本通过 Paxos 协议快速自主选出新 Leader 接管服务（RTO<8s），细粒度且对全局透明。",单选题
+64,3个Zone，2个同城，1个异地，同城一个机房宕机，下列说法正确的是： A. 强一致同步延迟变大 B. 会丢失秒级数据 C. 集群不可用 D. 合并业务基本不受影响,"正确答案：A
+
+详细解析
+A 项正确（强一致同步延迟变大）：
+正常运行时同城 2 副本达成多数派即可提交；同城一个机房宕机后，为了凑齐 2 票多数派必须等待异地跨城网络确认返回，因此强一致写同步延迟会明显增大。基于 Paxos 协议数据零丢失（RPO=0），集群依然可用。",单选题
+65,如果从传统 Oracle 业务迁移到 OceanBase，需要进行实时同步，推荐使用哪个工具？ A. OCP B. DataX C. OMS D. ODC,"正确答案：C
+
+详细解析
+C 项正确（OMS - OceanBase Migration Service）：
+OMS 是一站式数据传输工具，支持结构迁移、全量迁移、增量实时同步（CDC 解析事务日志）及反向同步回滚保障，支持业务平滑割接与实时同步。",单选题
+66,关于 OceanBase 资源隔离，以下哪一项是正确的？ A. 集群资源隔离 B. 数据库级隔离 C. schema 隔离 D. 租户级物理隔离,"正确答案：D
+
+详细解析
+D 项正确（租户级物理隔离）：
+多租户架构是 OceanBase 资源隔离的基本单元。通过 Resource Unit 为每个租户独立分配独占的 CPU（绑定 cgroups）、内存（独占 MemStore/Cache）以及 IOPS 配额，实现租户级物理隔离。",单选题
+67,哪个组件负责全集群资源分配、全局 DDL、集群数据合并调度等功能？ A. OB Proxy B. RootService 总控服务 C. OCP 运维平台 D. ODC 开发者工具,"正确答案：B
+
+详细解析
+B 项正确（RootService 总控服务 / RS）：
+RootService 负责全集群资源单元与资源池调度、系统 Schema 元数据与全局 DDL 协同、每日大合并调度以及副本健康均衡等核心中枢管控任务。",单选题
+68,哪个客户端工具可以直接连接 Oracle 租户进行业务开发？ A. OBClient (OceanBase 客户端) / ODC B. 标准 MySQL 客户端 C. OCP 运维平台 D. Navicat,"正确答案：A
+
+详细解析
+A 项正确（OBClient / ODC）：
+OBClient（命令行客户端）和 ODC（开发者中心）官方深度支持 Oracle 模式租户，完美支持 Oracle 语法、PL/SQL 存储过程调试及复杂对象管理。",单选题
+69,5个Zone，每个Zone有10台OB Server，一个分区日志流在集群中全部的副本数是？ A. 10 B. 3 C. 6 D. 5,"正确答案：D
+
+详细解析
+D 项正确（5 个副本）：
+为了实现机房级容灾，同一个分区/日志流在同一个 Zone 内部最多只能有 1 个副本。5 个 Zone 对应在集群中共有 5 个副本（1 Leader + 4 Follower），单 Zone 内的 10 台节点用于承载不同分区的水平扩展。",单选题
+70,关于 RootService 总控服务，说法正确的是： A. 每个Zone会有一个主控OB Server节点 B. 每个Zone有一个主控分区日志流 C. 整个集群只有一个主控Leader提供服务 D. 每台OB Server都会有一个,"正确答案：C
+
+详细解析
+C 项正确（整个集群只有一个主控 Leader 提供服务）：
+RootService 在任何时刻整个集群全局范围内仅有一个 Leader 处于激活状态并对外提供管控服务，伴随 sys 租户核心元数据表多副本运行并通过 Paxos 保证高可用。",单选题
+71,3机房3Zone部署，关于 Root Service 说法正确的是： A. 整个集群只有一个主控Leader B. 每个机房一个主控 C. 每个 observer 上都有 RootService提供服务 D. Root Service 不是必须的,"正确答案：A
+
+详细解析
+A 项正确（整个集群只有一个主控 Leader）：
+控制面全局统一，无论何种部署形态，整个集群内有且仅有一个处于主控工作状态的 RootService Leader。",单选题
+72,3个Zone，每Zone 5台OB Server，租户资源 Unit Num=4，请问有多少个节点上有该租户资源单元？ A. 3 B. 5 C. 12 D. 15,"正确答案：C
+
+详细解析
+C 项正确（12 个节点）：
+UNIT_NUM=4 代表每个 Zone 分配 4 个 Unit。同一个租户在同一 Zone 内的一台物理节点最多容纳 1 个 Unit。
+总节点数 = Zone 数量 × UNIT_NUM = 3 × 4 = 12 台 OBServer。",单选题
+73,OceanBase 租户资源的分配方式是：内存是 ___，CPU 是 ___？ A. 共享分配，独占分配 B. 独占分配，共享分配 C. 独占分配，独占分配 D. 共享分配，共享分配,"正确答案：C
+
+详细解析
+C 项正确（独占分配，独占分配）：
+内存（MEMORY_SIZE）在物理节点上严格独占预留且不可超卖；CPU（MIN_CPU/MAX_CPU）通过配额独占划分并在操作系统层绑定 cgroups 硬隔离，保障各租户互不干扰。",单选题
+74,关于 OceanBase 集群升级，说法正确的是： A. 需要维护人员停业务停机 B. 需要业务应用修改代码 C. 支持动态轮转升级，对业务透明 D. 必须使用高性能物理机替换,"正确答案：C
+
+详细解析
+C 项正确（支持动态轮转升级，对业务透明）：
+基于多副本 Paxos 协议支持按 Zone 在线滚动轮转升级，升级前平滑切主，多数派始终存活，业务不停机、对上层应用完全透明。",单选题
+75,哪个平台提供图形化界面，支持集群管理、租户管理、性能监控和告警？ A. ODC B. OCP C. OB Proxy D. OB Server,"正确答案：B
+
+详细解析
+B 项正确（OCP - OceanBase Cloud Platform）：
+OCP 是官方企业级图形化运维管控平台，提供集群与主机管理、租户全生命周期管理、性能监控诊断与多通道告警等功能。",单选题
+76,关于全能副本，说法正确的是： A. 有 MemTable 和 SSTable，参与投票，可快速恢复为 leader B. 没有日志 C. 不参与投票 D. 没有数据只有日志,"正确答案：A
+
+详细解析
+A 项正确（有 MemTable 和 SSTable，参与投票，可快速恢复为 leader）：
+全能副本（F 副本）拥有完整的数据（MemTable + SSTable）和事务日志，具备 Paxos 成员投票权，支持快速切主并对外提供强一致读写服务。",单选题
+77,OceanBase 支持哪些分区类型？ A. Hash、List、Range B. Hash、List C. 只有 Range D. 只有 Hash,"正确答案：A
+
+详细解析
+A 项正确（Hash、List、Range）：
+OceanBase 完整支持 Range（范围）、List（列表）、Hash（哈希）三种基础一级分区，以及它们的任意两两组合二级分区（Subpartitioning）。",单选题
+78,OceanBase 有哪些主要的副本类型？ A. 全能副本、日志副本、只读副本 B. 全能副本、数据副本 C. 读写副本、只读副本 D. 主副本、备副本,"正确答案：A
+
+详细解析
+A 项正确（全能副本、日志副本、只读副本）：
+全能副本（F 副本，全数据+日志+投票权）、日志副本（L 副本，仅日志+投票权）、只读副本（R 副本，异步同步+不投票+只读服务）。",单选题
+79,OceanBase 商业版支持哪种数据库 SQL 语法兼容？ A. MySQL B. 仅 Oracle C. 仅 DB2 D. 同时兼容 MySQL 和 Oracle,"正确答案：D
+
+详细解析
+D 项正确（同时兼容 MySQL 和 Oracle）：
+商业版原生支持双模式兼容，可在同一个集群内同时创建高度兼容的 MySQL 模式租户和 Oracle 模式租户。",单选题
+80,OBProxy（OceanBase 代理服务器）默认监听客户端连接的端口是？ A. 2881 B. 2882 C. 2883 D. 2884,"正确答案：C
+
+详细解析
+C 项正确（2883 端口）：
+2883 是 OBProxy 默认监听外部应用与客户端 SQL 连接请求的代理业务端口。
+2881 为 OBServer 的 SQL 端口；2882 为 OBServer 的内部 RPC 端口；2884 为 OBProxy 内部管理监控端口。",单选题
+81,在 OceanBase 数据库中，用于内部节点间通信的 RPC 端口默认是？ A. 2881 B. 2882 C. 2883 D. 2884,"正确答案：B
+
+详细解析
+B 项正确（2882 端口）：
+2882 是 OBServer 内部 RPC 通信端口，用于节点间 Paxos 日志同步复制、分布式执行计划跨机调度、两阶段提交协调与心跳探测。",单选题
+82,关于 OceanBase 的备份恢复机制，物理备份主要备份的是什么？ A. 仅有数据文件 (SSTable) B. 仅有日志文件 (Clog) C. 数据文件 (SSTable) + 增量事务日志 (Clog) D. 逻辑 SQL 脚本,"正确答案：C
+
+详细解析
+C 项正确（数据文件 SSTable + 增量事务日志 Clog）：
+物理备份由基线/增量数据文件（SSTable 快照）和流式持续日志归档（Clog）协同组成，结合回放实现精确到任意时间点的恢复（PITR）。",单选题
+83,当执行一条全表扫描的 SQL 时，OceanBase 的 SQL 引擎如何处理？ A. 只能在单个节点串行执行 B. 会把所有数据拉取到 OBProxy 执行 C. 可以生成分布式并行执行计划 (PX)，利用多节点并行扫描计算 D. 会被系统拒绝执行,"正确答案：C
+
+详细解析
+C 项正确（可以生成分布式并行执行计划 PX，利用多节点并行扫描计算）：
+优化器生成分布式并行执行计划，调度多节点上的工作线程在本地并行扫描和过滤计算，最后汇总返回，充分发挥集群算力与 I/O 吞吐。",单选题
+84,ODC（OceanBase 开发者中心）主要用于什么场景？ A. 集群的全生命周期管理与安装部署 B. 数据库对象的开发、SQL 编辑执行、PL/SQL 调试与数据导入导出 C. 异构数据库的数据迁移与实时同步 D. 物理服务器资源的监控,"正确答案：B
+
+详细解析
+B 项正确（数据库对象的开发、SQL 编辑执行、PL/SQL 调试与数据导入导出）：
+ODC 是企业级数据库协同开发平台，面向应用研发人员，支持 SQL 编辑、PL/SQL 调试、对象建模与数据导入导出。",单选题
+85,OceanBase 的 BlockCache（数据块缓存）主要用来缓存什么？ A. 经常访问的 SQL 执行计划 B. 数据表中的微块 (Micro Block) 数据，加速读操作 C. 分布式事务的状态信息 D. Paxos 的选举信息,"正确答案：B
+
+详细解析
+B 项正确（数据表中的微块 Micro Block 数据，加速读操作）：
+BlockCache 将磁盘 SSTable 中的解压/未解压数据微块缓存在内存中，减少物理磁盘 I/O 并降低读延迟。Plan Cache 缓存执行计划。",单选题
+86,关于 OceanBase 中 Zone 的描述，错误的是： A. Zone 是一个逻辑概念，通常映射为一个物理机房 B. 同一个 Zone 内可以包含多台 OBServer C. 租户的数据副本通常会在不同的 Zone 之间分布以实现容灾 D. 一个 Zone 宕机，整个集群的数据就会彻底丢失不可恢复,"正确答案：D
+
+详细解析
+D 项表述错误（符合题意）：
+基于 Paxos 多数派协议，单个 Zone 宕机时，其余 Zone 占据多数派，系统秒级自动选主恢复，数据零丢失（RPO=0，RTO<8s），绝不会丢失全部数据。",单选题
+87,在 OceanBase 的 Oracle 模式下，哪种对象可以封装和组织多个相关的存储过程和函数？ A. Package (包) B. Trigger (触发器) C. Sequence (序列) D. Synonym (同义词),"正确答案：A
+
+详细解析
+A 项正确（Package - 包）：
+在 Oracle 兼容模式下，Package（包）由包规范与包体组成，用于将逻辑相关的存储过程、函数、游标、变量和类型集中封装在一起。",单选题
+88,关于 OceanBase 中租户的内存隔离，说法错误的是？ A. 租户内存是物理独占的，互不干扰 B. 当某个租户内存不足时，可以借用其他空闲租户的内存 C. 租户的内存上限由 Unit 的配置决定 D. 租户内存不足会导致该租户内的事务因内存溢出报错,"正确答案：B
+
+详细解析
+B 项表述错误（符合题意）：
+租户内存采用严格的独占硬隔离机制，不支持跨租户动态借用或超卖，以防止内存争用引发节点崩溃或 OOM。A、C、D 项表述均正确。",单选题
+89,如果要在 OceanBase 集群中新建一个业务，第一步通常是做什么？ A. 创建表组 (Tablegroup) B. 创建资源单元模板 (Resource Unit) C. 直接执行 Create Database D. 直接执行 Create User,"正确答案：B
+
+详细解析
+B 项正确（创建资源单元模板 - Resource Unit）：
+标准生命周期流程为：创建资源单元模板（Resource Unit） $ightarrow$ 创建资源池（Resource Pool） $ightarrow$ 创建独立租户（Create Tenant） $ightarrow$ 登录租户创建用户、数据库与业务表。",单选题
