@@ -18,6 +18,7 @@ import {
   EyeOff,
   Keyboard,
   X,
+  Trash2,
 } from 'lucide-react';
 import { Flashcard } from '../types';
 import {
@@ -51,6 +52,7 @@ export function PracticeMode({
   const [isShuffled, setIsShuffled] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string[]>>({});
   const [isGridOpen, setIsGridOpen] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   useEffect(() => {
     if (selectedFile === '错题本') {
@@ -262,6 +264,14 @@ export function PracticeMode({
           >
             <LayoutGrid className="w-3.5 h-3.5" /> 题号列表
           </button>
+          {selectedFile === '错题本' && wrongCards.length > 0 && (
+            <button
+              onClick={() => setShowClearConfirm(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> 清空
+            </button>
+          )}
           <button
             onClick={handleDownloadCSV}
             disabled={originalCards.length === 0}
@@ -513,6 +523,25 @@ export function PracticeMode({
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {showClearConfirm && (
+        <div className="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
+              <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">确认清空错题本</h3>
+              <p className="text-sm text-slate-500 mb-6">您确定要清空所有的错题记录吗？清空后不可恢复。</p>
+              <div className="flex items-center gap-3">
+                 <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-colors">取消</button>
+                 <button onClick={() => {
+                   setWrongCards([]);
+                   setShowClearConfirm(false);
+                 }} className="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-colors">确认清空</button>
+              </div>
+           </div>
         </div>
       )}
     </>
