@@ -63,7 +63,8 @@ export function PracticeMode({
     } else {
       loadCards(selectedFile);
     }
-  }, [selectedFile, wrongCards, isShuffled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFile, isShuffled]);
 
   const loadCards = async (filename: string) => {
     setLoading(true);
