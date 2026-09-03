@@ -74,7 +74,19 @@ export function ExamMode({
 
       const fetchFile = async (name: string) => {
         const fileUrl = FILE_URLS[name];
-        const res = await fetch(`${baseUrl}${fileUrl}`);
+        let res;
+        let retries = 3;
+        while (retries > 0) {
+          try {
+            res = await fetch(`${baseUrl}${fileUrl}`);
+            if (res.ok) break;
+          } catch (fetchErr) {
+            if (retries === 1) throw fetchErr;
+          }
+          retries--;
+          await new Promise(r => setTimeout(r, 1000));
+        }
+        if (!res || !res.ok) throw new Error('Network response was not ok');
         const text = await res.text();
         return new Promise<Flashcard[]>((resolve) => {
           Papa.parse(text, {

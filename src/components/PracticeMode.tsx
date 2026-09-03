@@ -77,8 +77,21 @@ export function PracticeMode({
       const rawBase = import.meta.env.BASE_URL || '/';
       const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
       const fileUrl = FILE_URLS[filename];
-      const response = await fetch(`${baseUrl}${fileUrl}`);
-      if (!response.ok) throw new Error('Network response was not ok');
+      
+      let response;
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          response = await fetch(`${baseUrl}${fileUrl}`);
+          if (response.ok) break;
+        } catch (fetchErr) {
+          if (retries === 1) throw fetchErr;
+        }
+        retries--;
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      
+      if (!response || !response.ok) throw new Error('Network response was not ok');
       const csvText = await response.text();
 
       Papa.parse(csvText, {
@@ -100,8 +113,10 @@ export function PracticeMode({
           setLoading(false);
         },
       });
-    } catch (err) {
-      console.error('Failed to load file', err);
+    } catch (error) {
+      console.error('Error loading cards:', error);
+      const urlFailed = FILE_URLS[filename];
+      alert(`加载题库失败 (URL: ${urlFailed}): ${(error as Error).message}`);
       setOriginalCards([]);
       setCards([]);
       setLoading(false);
