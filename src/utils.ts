@@ -8,7 +8,7 @@ export const FILES = [
 
 export const cleanQuestionText = (text: string) => {
   if (!text) return '';
-  return text.replace(/^(?:\[.*?\]\s*)?\d+[、\.]?\s*/, '').trim();
+  return text.replace(/^(?:\[.*?\]\s*)?\d+[、\.]\s*/, '').trim();
 };
 
 export const getRowField = (row: any, ...keys: string[]) => {
